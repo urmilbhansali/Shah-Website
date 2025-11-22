@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Shah Distributors Worldwide</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .about-hero {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            min-height: 600px;
+            /* Replace this URL with your own warehouse photo with team */
+            background-image: url('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+        }
+        
+        .about-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+        
+        .about-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 40px;
+            background: rgba(26, 26, 26, 0.85);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .about-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #ff6600;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .about-content h2 {
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .about-content p {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: #f0f0f0;
+        }
+        
+        .about-content .highlight {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff6600;
+            margin: 30px 0;
+        }
+        
+        .about-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff6600;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #ccc;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .about-content {
+                padding: 20px;
+                margin: 20px;
+            }
+            
+            .about-content h1 {
+                font-size: 36px;
+            }
+            
+            .about-content h2 {
+                font-size: 24px;
+            }
+            
+            .about-content p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>Shah Distributors Worldwide</h1>
+            </div>
+            <nav class="nav">
+                <a href="index.html">Home</a>
+                <a href="about.html">About Us</a>
+                <a href="admin.html" style="color: #ff6600;">Admin</a>
+            </nav>
+            <div class="header-right">
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <span id="userName" class="user-name"></span>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+                <div id="googleSignIn" class="google-signin"></div>
+                <div class="cart-icon" onclick="toggleCart()">
+                    <span class="cart-badge" id="cartCount">0</span>
+                    🛒 Cart
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="about-hero">
+        <div class="about-content">
+            <h1>Shah Distributors</h1>
+            <h2>Worldwide</h2>
+            <div class="highlight">35 Years of Excellence</div>
+            <p>
+                For over three and a half decades, Shah Distributors Worldwide has been a trusted name in the distribution industry. 
+                Our commitment to quality, reliability, and customer satisfaction has made us a leader in our field.
+            </p>
+            <p>
+                With a dedicated team of professionals and a state-of-the-art warehouse facility, we ensure that every product 
+                meets the highest standards of excellence. Our extensive network allows us to serve customers across the globe, 
+                delivering on time, every time.
+            </p>
+            <p>
+                At Shah Distributors, we don't just sell products – we build relationships. Our experienced team works closely 
+                with each customer to understand their unique needs and provide tailored solutions that drive success.
+            </p>
+            <div class="about-stats">
+                <div class="stat-item">
+                    <span class="stat-number">35+</span>
+                    <span class="stat-label">Years in Business</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">55+</span>
+                    <span class="stat-label">Product Lines</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">1000+</span>
+                    <span class="stat-label">Happy Customers</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Shah Distributors Worldwide. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        // Minimal script for navigation - reuse from main site if needed
+        let currentUser = null;
+        
+        // Check if user is logged in
+        function checkUserSession() {
+            const savedUser = localStorage.getItem('user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUserUI();
+            }
+        }
+        
+        function updateUserUI() {
+            const userInfo = document.getElementById('userInfo');
+            const googleSignIn = document.getElementById('googleSignIn');
+            const userName = document.getElementById('userName');
+            
+            if (currentUser) {
+                userInfo.style.display = 'flex';
+                googleSignIn.style.display = 'none';
+                const tierName = currentUser.tier ? currentUser.tier.charAt(0).toUpperCase() + currentUser.tier.slice(1) : '';
+                userName.textContent = `${currentUser.name}${tierName ? ' (' + tierName + ')' : ''}`;
+            } else {
+                userInfo.style.display = 'none';
+                googleSignIn.style.display = 'block';
+            }
+        }
+        
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('user');
+            localStorage.removeItem('userPriceList');
+            // Redirect to login page
+            window.location.href = 'login.html';
+        }
+        
+        // Initialize Google Sign-In if needed
+        function initGoogleSignIn() {
+            if (typeof google === 'undefined' || !google.accounts) {
+                return;
+            }
+            
+            // Fetch Google Client ID from server
+            fetch('http://localhost:3000/api/config')
+                .then(response => response.json())
+                .then(data => {
+                    const clientId = data.googleClientId || '';
+                    if (clientId && clientId !== 'YOUR_GOOGLE_CLIENT_ID' && clientId !== 'your_google_client_id_here') {
+                        google.accounts.id.initialize({
+                            client_id: clientId,
+                            callback: handleGoogleSignIn,
+                            auto_select: false,
+                        });
+                        
+                        google.accounts.id.renderButton(
+                            document.getElementById('googleSignIn'),
+                            { 
+                                theme: 'outline', 
+                                size: 'medium',
+                                text: 'signin_with',
+                                width: 200
+                            }
+                        );
+                    } else {
+                        document.getElementById('googleSignIn').innerHTML = 
+                            '<div style="color: white; font-size: 11px; padding: 5px;">Google Sign-In not configured</div>';
+                    }
+                })
+                .catch(error => {
+                    console.log('Could not fetch client ID from server');
+                });
+        }
+        
+        async function handleGoogleSignIn(response) {
+            try {
+                const result = await fetch('http://localhost:3000/auth/google', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ credential: response.credential }),
+                });
+                
+                const data = await result.json();
+                
+                if (data.success) {
+                    currentUser = data.user;
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    updateUserUI();
+                    alert(`Welcome, ${currentUser.name}!`);
+                } else {
+                    alert('Login failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error during login:', error);
+                alert('Error during login. Please try again.');
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkUserSession();
+            if (typeof google !== 'undefined' && google.accounts) {
+                initGoogleSignIn();
+            } else {
+                window.addEventListener('load', () => {
+                    setTimeout(initGoogleSignIn, 500);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+

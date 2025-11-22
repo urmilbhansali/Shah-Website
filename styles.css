@@ -527,6 +527,14 @@ body {
     font-size: 12px;
 }
 
+.product-total.in-cart {
+    color: #4CAF50;
+    background-color: #e8f5e9;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
 .quantity-controls {
     display: flex;
     align-items: center;
@@ -585,8 +593,12 @@ body {
 
 .qty-input::-webkit-inner-spin-button,
 .qty-input::-webkit-outer-spin-button {
-    opacity: 1;
-    height: 20px;
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.qty-input {
+    -moz-appearance: textfield;
 }
 
 .add-to-cart-btn {

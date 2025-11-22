@@ -4,6 +4,7 @@ const cors = require('cors');
 const { OAuth2Client } = require('google-auth-library');
 const PDFDocument = require('pdfkit');
 const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
@@ -18,9 +19,43 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 let userPriceLists = {};
 const PRICE_LIST_FILE = path.join(__dirname, 'user_price_lists.json');
 
+// Tier-based pricing system with product-specific markups
+let tierConfig = {
+    bronze: { markups: {}, customers: {} }, // markups: { productId: markup% }
+    silver: { markups: {}, customers: {} },
+    gold: { markups: {}, customers: {} }
+};
+const TIER_CONFIG_FILE = path.join(__dirname, 'tier_config.json');
+
 // In-memory storage for orders (in production, use a database)
 let orders = {};
 const ORDERS_FILE = path.join(__dirname, 'orders.json');
+
+// In-memory storage for products/inventory
+let products = [];
+const PRODUCTS_FILE = path.join(__dirname, 'products.json');
+
+// In-memory storage for email-based users
+let users = {};
+const USERS_FILE = path.join(__dirname, 'users.json');
+
+// Load users from file if it exists
+if (fs.existsSync(USERS_FILE)) {
+    try {
+        users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    } catch (error) {
+        console.error('Error loading users:', error);
+    }
+}
+
+// Save users to file
+function saveUsers() {
+    try {
+        fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+    } catch (error) {
+        console.error('Error saving users:', error);
+    }
+}
 
 // Load orders from file if it exists
 if (fs.existsSync(ORDERS_FILE)) {
@@ -31,12 +66,31 @@ if (fs.existsSync(ORDERS_FILE)) {
     }
 }
 
+// Load products from file if it exists
+if (fs.existsSync(PRODUCTS_FILE)) {
+    try {
+        products = JSON.parse(fs.readFileSync(PRODUCTS_FILE, 'utf8'));
+    } catch (error) {
+        console.error('Error loading products:', error);
+        // If file doesn't exist or is invalid, products will be empty array
+    }
+}
+
 // Save orders to file
 function saveOrders() {
     try {
         fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2));
     } catch (error) {
         console.error('Error saving orders:', error);
+    }
+}
+
+// Save products to file
+function saveProducts() {
+    try {
+        fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2));
+    } catch (error) {
+        console.error('Error saving products:', error);
     }
 }
 
@@ -65,6 +119,15 @@ if (fs.existsSync(PRICE_LIST_FILE)) {
     }
 }
 
+// Load tier configuration from file if it exists
+if (fs.existsSync(TIER_CONFIG_FILE)) {
+    try {
+        tierConfig = JSON.parse(fs.readFileSync(TIER_CONFIG_FILE, 'utf8'));
+    } catch (error) {
+        console.error('Error loading tier config:', error);
+    }
+}
+
 // Save user price lists to file
 function savePriceLists() {
     try {
@@ -74,9 +137,40 @@ function savePriceLists() {
     }
 }
 
+// Save tier configuration to file
+function saveTierConfig() {
+    try {
+        fs.writeFileSync(TIER_CONFIG_FILE, JSON.stringify(tierConfig, null, 2));
+    } catch (error) {
+        console.error('Error saving tier config:', error);
+    }
+}
+
+// Get customer tier based on email
+function getCustomerTier(email) {
+    if (tierConfig.gold.customers[email]) return 'gold';
+    if (tierConfig.silver.customers[email]) return 'silver';
+    if (tierConfig.bronze.customers[email]) return 'bronze';
+    return 'bronze'; // Default to bronze
+}
+
+// Calculate price based on original cost and tier markup (product-specific)
+function calculateTierPrice(originalCost, tier, productId) {
+    if (!originalCost || originalCost <= 0) return null;
+    // Get product-specific markup, or default to 0 if not set
+    const markup = tierConfig[tier]?.markups?.[productId] || 0;
+    return originalCost * (1 + markup / 100);
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve login.html as default landing page (before static files)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'login.html'));
+});
+
 app.use(express.static('.'));
 
 // Get config endpoint (for Google Client ID)
@@ -92,6 +186,134 @@ app.get('/api/config', (req, res) => {
         res.json({
             googleClientId: '',
         });
+    }
+});
+
+// Email signup endpoint
+app.post('/auth/email/signup', async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+        
+        if (!name || !email || !password) {
+            return res.status(400).json({ success: false, error: 'All fields are required' });
+        }
+        
+        if (password.length < 6) {
+            return res.status(400).json({ success: false, error: 'Password must be at least 6 characters long' });
+        }
+        
+        // Check if user already exists
+        if (users[email]) {
+            return res.status(400).json({ success: false, error: 'Email already registered. Please sign in instead.' });
+        }
+        
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        // Create user
+        const userId = 'email_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        users[email] = {
+            id: userId,
+            email: email,
+            name: name,
+            password: hashedPassword,
+            createdAt: new Date().toISOString(),
+        };
+        
+        saveUsers();
+        
+        // Get customer tier based on email
+        const customerTier = getCustomerTier(email);
+        
+        // Calculate tier-based price list for this user
+        const tierPriceList = {};
+        products.forEach(product => {
+            const originalCost = product.originalCost || product.price;
+            const tierPrice = calculateTierPrice(originalCost, customerTier, product.id);
+            if (tierPrice) {
+                tierPriceList[product.id] = {
+                    price: tierPrice,
+                    originalPrice: product.originalPrice || originalCost,
+                    isClearance: product.isClearance || false,
+                };
+            }
+        });
+        
+        // Create user object for response (without password)
+        const user = {
+            id: userId,
+            email: email,
+            name: name,
+            tier: customerTier,
+        };
+        
+        res.json({
+            success: true,
+            user: user,
+            priceList: tierPriceList,
+            tier: customerTier,
+        });
+    } catch (error) {
+        console.error('Error during signup:', error);
+        res.status(500).json({ success: false, error: 'Server error during signup' });
+    }
+});
+
+// Email login endpoint
+app.post('/auth/email/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        
+        if (!email || !password) {
+            return res.status(400).json({ success: false, error: 'Email and password are required' });
+        }
+        
+        // Check if user exists
+        const user = users[email];
+        if (!user) {
+            return res.status(401).json({ success: false, error: 'Invalid email or password' });
+        }
+        
+        // Verify password
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ success: false, error: 'Invalid email or password' });
+        }
+        
+        // Get customer tier based on email
+        const customerTier = getCustomerTier(email);
+        
+        // Calculate tier-based price list for this user
+        const tierPriceList = {};
+        products.forEach(product => {
+            const originalCost = product.originalCost || product.price;
+            const tierPrice = calculateTierPrice(originalCost, customerTier, product.id);
+            if (tierPrice) {
+                tierPriceList[product.id] = {
+                    price: tierPrice,
+                    originalPrice: product.originalPrice || originalCost,
+                    isClearance: product.isClearance || false,
+                };
+            }
+        });
+        
+        // Create user object for response (without password)
+        const userResponse = {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            tier: customerTier,
+        };
+        
+        res.json({
+            success: true,
+            user: userResponse,
+            priceList: tierPriceList,
+            tier: customerTier,
+        });
+    } catch (error) {
+        console.error('Error during login:', error);
+        res.status(500).json({ success: false, error: 'Server error during login' });
     }
 });
 
@@ -132,17 +354,31 @@ app.post('/auth/google', async (req, res) => {
             token: credential, // In production, generate a proper JWT token
         };
 
-        // Get or create user price list
-        if (!userPriceLists[userId]) {
-            // Create default price list (same as base prices for now)
-            // In production, you'd fetch this from a database
-            userPriceLists[userId] = {};
-        }
+        // Get customer tier based on email
+        const customerTier = getCustomerTier(userEmail);
+        
+        // Calculate tier-based price list for this user
+        const tierPriceList = {};
+        products.forEach(product => {
+            const originalCost = product.originalCost || product.price; // Use originalCost if available, fallback to price
+            const tierPrice = calculateTierPrice(originalCost, customerTier, product.id);
+            if (tierPrice) {
+                tierPriceList[product.id] = {
+                    price: tierPrice,
+                    originalPrice: product.originalPrice || originalCost,
+                    isClearance: product.isClearance || false,
+                };
+            }
+        });
+
+        // Store user tier assignment
+        user.tier = customerTier;
 
         res.json({
             success: true,
             user: user,
-            priceList: userPriceLists[userId],
+            priceList: tierPriceList,
+            tier: customerTier,
         });
     } catch (error) {
         console.error('Error verifying Google token:', error);
@@ -570,6 +806,335 @@ app.post('/create-checkout-session', async (req, res) => {
     } catch (error) {
         console.error('Error creating checkout session:', error);
         res.status(500).json({ error: error.message });
+    }
+});
+
+// Admin endpoint to get all orders
+app.get('/api/admin/orders', (req, res) => {
+    try {
+        // Convert orders object to array
+        const ordersArray = Object.values(orders);
+        
+        res.json({
+            success: true,
+            orders: ordersArray,
+            count: ordersArray.length,
+        });
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Admin endpoint to update order status (mark as fulfilled)
+app.post('/api/admin/orders/:orderId/fulfill', (req, res) => {
+    try {
+        const { orderId } = req.params;
+        
+        if (!orders[orderId]) {
+            return res.status(404).json({ success: false, error: 'Order not found' });
+        }
+        
+        orders[orderId].fulfilled = true;
+        orders[orderId].fulfilledDate = new Date().toISOString();
+        saveOrders();
+        
+        res.json({
+            success: true,
+            message: 'Order marked as fulfilled',
+        });
+    } catch (error) {
+        console.error('Error updating order:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Admin endpoint to get inventory
+app.get('/api/admin/inventory', (req, res) => {
+    try {
+        // Reload products from file to ensure latest data
+        if (fs.existsSync(PRODUCTS_FILE)) {
+            try {
+                const fileData = fs.readFileSync(PRODUCTS_FILE, 'utf8');
+                products = JSON.parse(fileData);
+            } catch (error) {
+                console.error('Error reloading products:', error);
+            }
+        }
+        
+        res.json({
+            success: true,
+            inventory: products || [],
+            count: products ? products.length : 0,
+        });
+    } catch (error) {
+        console.error('Error fetching inventory:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Admin endpoint to update inventory
+app.post('/api/admin/inventory', (req, res) => {
+    try {
+        const { inventory } = req.body;
+        
+        if (!inventory || !Array.isArray(inventory)) {
+            return res.status(400).json({ success: false, error: 'Invalid inventory data' });
+        }
+
+        products = inventory;
+        saveProducts();
+        
+        res.json({
+            success: true,
+            message: 'Inventory updated successfully',
+            count: products.length,
+        });
+    } catch (error) {
+        console.error('Error updating inventory:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Admin endpoint to export orders as Excel
+app.get('/api/admin/orders/export/excel', async (req, res) => {
+    try {
+        const XLSX = require('xlsx');
+        const ordersArray = Object.values(orders);
+        
+        if (ordersArray.length === 0) {
+            return res.status(404).json({ success: false, error: 'No orders to export' });
+        }
+        
+        // Prepare data for Excel
+        const excelData = ordersArray.map(order => {
+            const itemsList = order.items.map(item => 
+                `${item.name} (Qty: ${item.quantity}, Price: $${item.price.toFixed(2)})`
+            ).join('; ');
+            
+            const shippingAddress = order.shippingAddress 
+                ? `${order.shippingAddress.name}, ${order.shippingAddress.address}, ${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.zip}`
+                : 'Pickup';
+            
+            return {
+                'Order ID': order.orderId,
+                'Date': new Date(order.date).toLocaleString(),
+                'Customer Email': order.shippingEmail,
+                'Items': itemsList,
+                'Subtotal': order.subtotal,
+                'Shipping Cost': order.shippingCost,
+                'Total': order.subtotal + order.shippingCost,
+                'Payment Method': order.paymentMethod === 'card' ? 'Card' : 'Cash on Delivery',
+                'Shipping Method': order.shippingMethod || 'N/A',
+                'Shipping Address': shippingAddress,
+                'Status': order.fulfilled ? 'Fulfilled' : (order.paymentMethod === 'cash' ? 'Pending' : 'Paid'),
+                'Fulfilled': order.fulfilled ? 'Yes' : 'No',
+            };
+        });
+        
+        // Create workbook
+        const ws = XLSX.utils.json_to_sheet(excelData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Orders');
+        
+        // Generate buffer
+        const excelBuffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+        
+        // Set headers
+        const filename = `orders_${new Date().toISOString().split('T')[0]}.xlsx`;
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        
+        res.send(excelBuffer);
+    } catch (error) {
+        console.error('Error exporting orders:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Admin endpoint to get tier configuration
+app.get('/api/admin/pricelist/tiers', (req, res) => {
+    try {
+        // Only return customer info, not full markups (markups are large and not needed for customer list)
+        const tiers = {
+            bronze: {
+                markups: {}, // Don't send markups - they're large and not needed for customer display
+                customers: Object.values(tierConfig.bronze.customers || {})
+            },
+            silver: {
+                markups: {},
+                customers: Object.values(tierConfig.silver.customers || {})
+            },
+            gold: {
+                markups: {},
+                customers: Object.values(tierConfig.gold.customers || {})
+            }
+        };
+        
+        res.json({
+            success: true,
+            tiers: tiers,
+        });
+    } catch (error) {
+        console.error('Error fetching tier config:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Admin endpoint to export tier price list to Excel
+app.get('/api/admin/pricelist/tiers/:tier/export', async (req, res) => {
+    try {
+        const { tier } = req.params;
+        
+        if (!['bronze', 'silver', 'gold'].includes(tier)) {
+            return res.status(400).json({ success: false, error: 'Invalid tier' });
+        }
+
+        const XLSX = require('xlsx');
+        const markups = tierConfig[tier]?.markups || {};
+        
+        // Prepare data for Excel
+        const excelData = products.map(product => {
+            const productMarkup = markups[product.id] || 0;
+            const originalCost = product.originalCost || product.price || 0;
+            const customerPrice = calculateTierPrice(originalCost, tier, product.id) || originalCost;
+            
+            return {
+                'ID': product.id,
+                'SKU': product.sku,
+                'Sub-SKU': product.subSku || '',
+                'Product Name': product.name,
+                'Original Cost': originalCost,
+                'Markup %': productMarkup,
+                'Customer Price': customerPrice,
+            };
+        });
+        
+        // Create workbook
+        const ws = XLSX.utils.json_to_sheet(excelData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, `${tier.charAt(0).toUpperCase() + tier.slice(1)} Tier`);
+        
+        // Generate buffer
+        const excelBuffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+        
+        // Set headers
+        const filename = `${tier}_tier_pricelist_${new Date().toISOString().split('T')[0]}.xlsx`;
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        
+        res.send(excelBuffer);
+    } catch (error) {
+        console.error('Error exporting tier price list:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Admin endpoint to import tier price list from Excel
+app.post('/api/admin/pricelist/tiers/:tier/import', (req, res) => {
+    try {
+        const { tier } = req.params;
+        const { markups } = req.body; // Array of { productId, markup }
+        
+        if (!['bronze', 'silver', 'gold'].includes(tier)) {
+            return res.status(400).json({ success: false, error: 'Invalid tier' });
+        }
+        
+        if (!markups || !Array.isArray(markups)) {
+            return res.status(400).json({ success: false, error: 'Invalid markups data' });
+        }
+
+        // Update markups for this tier
+        tierConfig[tier].markups = {};
+        markups.forEach(item => {
+            if (item.productId && item.markup !== undefined) {
+                tierConfig[tier].markups[item.productId] = parseFloat(item.markup) || 0;
+            }
+        });
+        
+        saveTierConfig();
+        
+        res.json({
+            success: true,
+            message: `${tier} tier price list updated`,
+            count: Object.keys(tierConfig[tier].markups).length,
+        });
+    } catch (error) {
+        console.error('Error importing tier price list:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Admin endpoint to add customer to tier
+app.post('/api/admin/pricelist/tiers/:tier/customers', async (req, res) => {
+    try {
+        const { tier } = req.params;
+        const { email } = req.body;
+        
+        if (!['bronze', 'silver', 'gold'].includes(tier)) {
+            return res.status(400).json({ success: false, error: 'Invalid tier' });
+        }
+        
+        if (!email) {
+            return res.status(400).json({ success: false, error: 'Email required' });
+        }
+
+        // Remove customer from other tiers first
+        Object.keys(tierConfig).forEach(t => {
+            if (tierConfig[t].customers[email]) {
+                delete tierConfig[t].customers[email];
+            }
+        });
+
+        // Add to specified tier
+        // Try to get customer name from existing user data if available
+        let customerName = email.split('@')[0]; // Default to email username
+        tierConfig[tier].customers[email] = {
+            email: email,
+            name: customerName,
+            addedDate: new Date().toISOString()
+        };
+        
+        saveTierConfig();
+        
+        res.json({
+            success: true,
+            message: 'Customer added to tier',
+        });
+    } catch (error) {
+        console.error('Error adding customer to tier:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Admin endpoint to remove customer from tier
+app.delete('/api/admin/pricelist/tiers/:tier/customers', (req, res) => {
+    try {
+        const { tier } = req.params;
+        const { email } = req.body;
+        
+        if (!['bronze', 'silver', 'gold'].includes(tier)) {
+            return res.status(400).json({ success: false, error: 'Invalid tier' });
+        }
+        
+        if (!email) {
+            return res.status(400).json({ success: false, error: 'Email required' });
+        }
+
+        if (tierConfig[tier].customers[email]) {
+            delete tierConfig[tier].customers[email];
+            saveTierConfig();
+            
+            res.json({
+                success: true,
+                message: 'Customer removed from tier',
+            });
+        } else {
+            res.status(404).json({ success: false, error: 'Customer not found in tier' });
+        }
+    } catch (error) {
+        console.error('Error removing customer from tier:', error);
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 

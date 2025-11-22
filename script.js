@@ -563,7 +563,8 @@ async function handleGoogleSignIn(response) {
             // Reload products with user-specific prices
             renderProducts();
             
-            alert(`Welcome, ${currentUser.name}!`);
+            const tierName = data.tier ? data.tier.charAt(0).toUpperCase() + data.tier.slice(1) : '';
+            alert(`Welcome, ${currentUser.name}!${tierName ? ' You are a ' + tierName + ' tier customer.' : ''}`);
         } else {
             alert('Login failed. Please try again.');
         }
@@ -573,19 +574,25 @@ async function handleGoogleSignIn(response) {
     }
 }
 
-// Check if user session exists
+// Check if user is authenticated, redirect to login if not
 function checkUserSession() {
     const savedUser = localStorage.getItem('user');
-    const savedPriceList = localStorage.getItem('userPriceList');
-    
-    if (savedUser && savedPriceList) {
-        currentUser = JSON.parse(savedUser);
-        userPriceList = JSON.parse(savedPriceList);
-        updateUserUI();
-        
-        // Fetch latest price list from server
-        fetchUserPriceList();
+    if (!savedUser) {
+        // User not logged in, redirect to login page
+        window.location.href = 'login.html';
+        return false;
     }
+    
+    const savedPriceList = localStorage.getItem('userPriceList');
+    currentUser = JSON.parse(savedUser);
+    if (savedPriceList) {
+        userPriceList = JSON.parse(savedPriceList);
+    }
+    updateUserUI();
+    
+    // Fetch latest price list from server
+    fetchUserPriceList();
+    return true;
 }
 
 // Fetch user price list from server
@@ -593,18 +600,10 @@ async function fetchUserPriceList() {
     if (!currentUser) return;
     
     try {
-        const response = await fetch(`http://localhost:3000/api/user/${currentUser.id}/pricelist`, {
-            headers: {
-                'Authorization': `Bearer ${currentUser.token}`,
-            },
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            userPriceList = data.priceList;
-            localStorage.setItem('userPriceList', JSON.stringify(userPriceList));
-            renderProducts(); // Re-render with updated prices
-        }
+        // Re-authenticate to get updated tier-based pricing
+        // For now, we'll use the stored price list, but in production you'd refresh from server
+        // The price list is already calculated based on tier when user logs in
+        renderProducts(); // Re-render with current prices
     } catch (error) {
         console.error('Error fetching price list:', error);
     }
@@ -619,7 +618,8 @@ function updateUserUI() {
     if (currentUser) {
         userInfo.style.display = 'flex';
         googleSignIn.style.display = 'none';
-        userName.textContent = currentUser.name;
+        const tierName = currentUser.tier ? currentUser.tier.charAt(0).toUpperCase() + currentUser.tier.slice(1) : '';
+        userName.textContent = `${currentUser.name}${tierName ? ' (' + tierName + ')' : ''}`;
     } else {
         userInfo.style.display = 'none';
         googleSignIn.style.display = 'block';
@@ -632,9 +632,8 @@ function logout() {
     userPriceList = null;
     localStorage.removeItem('user');
     localStorage.removeItem('userPriceList');
-    updateUserUI();
-    renderProducts(); // Re-render with default prices
-    alert('You have been logged out.');
+    // Redirect to login page
+    window.location.href = 'login.html';
 }
 
 // Validate email format
@@ -790,6 +789,10 @@ function renderProducts(filterText = '') {
         // Units per pack display
         const unitsPerPackDisplay = product.unitsPerPack ? `${product.unitsPerPack}` : '1';
         
+        // Check if product is in cart (quantity > 0)
+        const isInCart = quantity > 0;
+        const totalClass = isInCart ? 'product-total in-cart' : 'product-total';
+        
         row.innerHTML = `
             <td class="product-sku">${product.sku}${subSkuDisplay}</td>
             <td class="product-name">${product.name} ${clearanceSticker}</td>
@@ -801,7 +804,7 @@ function renderProducts(filterText = '') {
                 <input type="number" class="qty-input" id="qty-${product.id}" value="${quantity}" min="0" ${product.stock !== undefined ? `max="${product.stock}"` : ''} onchange="updateProductQuantityManual(${product.id})" onkeypress="if(event.key==='Enter'){updateProductQuantityManual(${product.id})}" />
                 <button class="qty-btn qty-plus" onclick="updateProductQuantity(${product.id}, 1)" ${product.stock !== undefined && product.stock === 0 ? 'disabled' : ''}>+</button>
             </td>
-            <td class="product-total" id="total-${product.id}">$${total}</td>
+            <td class="${totalClass}" id="total-${product.id}">$${total}</td>
         `;
         productsTableBody.appendChild(row);
     });
@@ -848,6 +851,13 @@ function updateProductQuantityManual(productId) {
     if (totalDisplay) {
         const total = (productPrice * newQuantity).toFixed(2);
         totalDisplay.textContent = `$${total}`;
+        
+        // Update green highlight based on cart status
+        if (newQuantity > 0) {
+            totalDisplay.classList.add('in-cart');
+        } else {
+            totalDisplay.classList.remove('in-cart');
+        }
     }
     
     // Automatically update cart based on quantity change
@@ -912,6 +922,13 @@ function updateProductQuantity(productId, change) {
         const productPrice = getProductPrice(product);
         const total = (productPrice * newQuantity).toFixed(2);
         totalDisplay.textContent = `$${total}`;
+        
+        // Update green highlight based on cart status
+        if (newQuantity > 0) {
+            totalDisplay.classList.add('in-cart');
+        } else {
+            totalDisplay.classList.remove('in-cart');
+        }
     }
     
     // Automatically update cart based on quantity change
@@ -953,6 +970,7 @@ function addToCart(productId) {
             const productPrice = getProductPrice(product);
             const total = productPrice.toFixed(2);
             totalDisplay.textContent = `$${total}`;
+            totalDisplay.classList.add('in-cart'); // Highlight when added to cart
         }
     }
 
@@ -998,6 +1016,7 @@ function removeFromCart(productId) {
     if (qtyDisplay && totalDisplay) {
         qtyDisplay.value = 0;
         totalDisplay.textContent = '$0.00';
+        totalDisplay.classList.remove('in-cart'); // Remove highlight when removed from cart
     }
     
     updateCart();
@@ -1045,6 +1064,13 @@ function updateQuantity(productId, change) {
             qtyDisplay.value = item.quantity;
             const total = (product.price * item.quantity).toFixed(2);
             totalDisplay.textContent = `$${total}`;
+            
+            // Update green highlight based on cart status
+            if (item.quantity > 0) {
+                totalDisplay.classList.add('in-cart');
+            } else {
+                totalDisplay.classList.remove('in-cart');
+            }
         }
         
         updateCart();

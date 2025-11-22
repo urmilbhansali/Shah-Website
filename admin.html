@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Shah Distributors Worldwide</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .admin-header {
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .admin-header h1 {
+            margin: 0;
+            color: #ff6600;
+        }
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ff6600;
+        }
+        .admin-actions {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .admin-btn {
+            padding: 10px 20px;
+            background: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .admin-btn:hover {
+            background: #e55a00;
+        }
+        .admin-btn.secondary {
+            background: #666;
+        }
+        .admin-btn.secondary:hover {
+            background: #555;
+        }
+        .orders-table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .orders-table th {
+            background: #1a1a1a;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .orders-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 11px;
+        }
+        .orders-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        .order-status {
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .status-paid {
+            background: #4CAF50;
+            color: white;
+        }
+        .status-pending {
+            background: #ff9800;
+            color: white;
+        }
+        .order-items {
+            font-size: 10px;
+            color: #666;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .no-orders {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Admin Dashboard - Order Management</h1>
+            <p style="margin: 5px 0 0 0; font-size: 12px;">Shah Distributors Worldwide</p>
+        </div>
+
+        <div class="admin-stats" id="statsContainer">
+            <div class="stat-card">
+                <h3>Total Orders</h3>
+                <div class="value" id="totalOrders">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Revenue</h3>
+                <div class="value" id="totalRevenue">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Today's Orders</h3>
+                <div class="value" id="todayOrders">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pending Orders</h3>
+                <div class="value" id="pendingOrders">-</div>
+            </div>
+        </div>
+
+        <div class="admin-actions">
+            <button class="admin-btn" onclick="refreshOrders()">🔄 Refresh Orders</button>
+            <button class="admin-btn" onclick="exportToExcel()">📊 Export to Excel</button>
+            <button class="admin-btn secondary" onclick="exportToCSV()">📄 Export to CSV</button>
+            <button class="admin-btn success" onclick="window.location.href='inventory.html'">📦 Manage Inventory</button>
+            <button class="admin-btn success" onclick="window.location.href='pricelist.html'">💰 Manage Price Lists</button>
+            <button class="admin-btn secondary" onclick="window.location.href='index.html'">← Back to Store</button>
+        </div>
+
+        <div id="ordersContainer">
+            <div class="loading">Loading orders...</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script>
+        let orders = [];
+
+        // Load orders on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadOrders();
+        });
+
+        async function loadOrders() {
+            try {
+                const response = await fetch('http://localhost:3000/api/admin/orders');
+                const data = await response.json();
+                
+                if (data.success) {
+                    orders = data.orders;
+                    updateStats();
+                    renderOrders();
+                } else {
+                    document.getElementById('ordersContainer').innerHTML = 
+                        '<div class="no-orders">Error loading orders: ' + (data.error || 'Unknown error') + '</div>';
+                }
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                document.getElementById('ordersContainer').innerHTML = 
+                    '<div class="no-orders">Error connecting to server. Make sure the server is running.</div>';
+            }
+        }
+
+        function updateStats() {
+            const totalOrders = orders.length;
+            const totalRevenue = orders.reduce((sum, order) => sum + (order.subtotal + order.shippingCost), 0);
+            
+            const today = new Date().toDateString();
+            const todayOrders = orders.filter(order => new Date(order.date).toDateString() === today).length;
+            
+            const pendingOrders = orders.filter(order => order.paymentMethod === 'cash' && !order.fulfilled).length;
+
+            document.getElementById('totalOrders').textContent = totalOrders;
+            document.getElementById('totalRevenue').textContent = '$' + totalRevenue.toFixed(2);
+            document.getElementById('todayOrders').textContent = todayOrders;
+            document.getElementById('pendingOrders').textContent = pendingOrders;
+        }
+
+        function renderOrders() {
+            const container = document.getElementById('ordersContainer');
+            
+            if (orders.length === 0) {
+                container.innerHTML = '<div class="no-orders">No orders found.</div>';
+                return;
+            }
+
+            // Sort by date (newest first)
+            const sortedOrders = [...orders].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            let html = `
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Customer Email</th>
+                            <th>Items</th>
+                            <th>Subtotal</th>
+                            <th>Shipping</th>
+                            <th>Total</th>
+                            <th>Payment</th>
+                            <th>Shipping Method</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            sortedOrders.forEach(order => {
+                const orderDate = new Date(order.date).toLocaleString();
+                const itemsSummary = order.items.map(item => `${item.name} (${item.quantity}x)`).join(', ');
+                const status = order.fulfilled ? 'Fulfilled' : (order.paymentMethod === 'cash' ? 'Pending' : 'Paid');
+                const statusClass = order.fulfilled ? 'status-paid' : (order.paymentMethod === 'cash' ? 'status-pending' : 'status-paid');
+
+                html += `
+                    <tr>
+                        <td><strong>${order.orderId}</strong></td>
+                        <td>${orderDate}</td>
+                        <td>${order.shippingEmail}</td>
+                        <td class="order-items" title="${itemsSummary}">${itemsSummary.substring(0, 50)}${itemsSummary.length > 50 ? '...' : ''}</td>
+                        <td>$${order.subtotal.toFixed(2)}</td>
+                        <td>$${order.shippingCost.toFixed(2)}</td>
+                        <td><strong>$${(order.subtotal + order.shippingCost).toFixed(2)}</strong></td>
+                        <td>${order.paymentMethod === 'card' ? 'Card' : 'Cash'}</td>
+                        <td>${order.shippingMethod || 'N/A'}</td>
+                        <td><span class="order-status ${statusClass}">${status}</span></td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function refreshOrders() {
+            document.getElementById('ordersContainer').innerHTML = '<div class="loading">Refreshing orders...</div>';
+            loadOrders();
+        }
+
+        function exportToExcel() {
+            if (orders.length === 0) {
+                alert('No orders to export');
+                return;
+            }
+
+            // Prepare data for Excel
+            const excelData = orders.map(order => {
+                const itemsList = order.items.map(item => `${item.name} (Qty: ${item.quantity}, Price: $${item.price.toFixed(2)})`).join('; ');
+                const shippingAddress = order.shippingAddress 
+                    ? `${order.shippingAddress.name}, ${order.shippingAddress.address}, ${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.zip}`
+                    : 'Pickup';
+                
+                return {
+                    'Order ID': order.orderId,
+                    'Date': new Date(order.date).toLocaleString(),
+                    'Customer Email': order.shippingEmail,
+                    'Items': itemsList,
+                    'Subtotal': order.subtotal,
+                    'Shipping Cost': order.shippingCost,
+                    'Total': order.subtotal + order.shippingCost,
+                    'Payment Method': order.paymentMethod === 'card' ? 'Card' : 'Cash on Delivery',
+                    'Shipping Method': order.shippingMethod || 'N/A',
+                    'Shipping Address': shippingAddress,
+                    'Status': order.fulfilled ? 'Fulfilled' : (order.paymentMethod === 'cash' ? 'Pending' : 'Paid')
+                };
+            });
+
+            // Create workbook and worksheet
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Orders');
+
+            // Generate filename with date
+            const filename = `orders_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+            // Download
+            XLSX.writeFile(wb, filename);
+        }
+
+        function exportToCSV() {
+            if (orders.length === 0) {
+                alert('No orders to export');
+                return;
+            }
+
+            // Prepare CSV header
+            const headers = ['Order ID', 'Date', 'Customer Email', 'Items', 'Subtotal', 'Shipping Cost', 'Total', 'Payment Method', 'Shipping Method', 'Shipping Address', 'Status'];
+            
+            // Prepare CSV rows
+            const rows = orders.map(order => {
+                const itemsList = order.items.map(item => `${item.name} (Qty: ${item.quantity}, Price: $${item.price.toFixed(2)})`).join('; ');
+                const shippingAddress = order.shippingAddress 
+                    ? `${order.shippingAddress.name}, ${order.shippingAddress.address}, ${order.shippingAddress.city}, ${order.shippingAddress.state} ${order.shippingAddress.zip}`
+                    : 'Pickup';
+                
+                return [
+                    order.orderId,
+                    new Date(order.date).toLocaleString(),
+                    order.shippingEmail,
+                    itemsList,
+                    order.subtotal,
+                    order.shippingCost,
+                    order.subtotal + order.shippingCost,
+                    order.paymentMethod === 'card' ? 'Card' : 'Cash on Delivery',
+                    order.shippingMethod || 'N/A',
+                    shippingAddress,
+                    order.fulfilled ? 'Fulfilled' : (order.paymentMethod === 'cash' ? 'Pending' : 'Paid')
+                ];
+            });
+
+            // Convert to CSV
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+            ].join('\n');
+
+            // Download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const filename = `orders_${new Date().toISOString().split('T')[0]}.csv`;
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+    </script>
+</body>
+</html>
+

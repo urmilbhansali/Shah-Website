@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price List Management - Shah Distributors Worldwide</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .pricelist-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .pricelist-header {
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .pricelist-header h1 {
+            margin: 0;
+            color: #ff6600;
+        }
+        .tier-section {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .tier-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        .tier-name {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .tier-bronze { color: #cd7f32; }
+        .tier-silver { color: #c0c0c0; }
+        .tier-gold { color: #ffd700; }
+        .markup-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .markup-input {
+            width: 100px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        .markup-input:focus {
+            outline: none;
+            border-color: #ff6600;
+        }
+        .save-markup-btn {
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .save-markup-btn:hover {
+            background: #45a049;
+        }
+        .customers-list {
+            margin-top: 15px;
+        }
+        .customers-list h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .customer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: #f9f9f9;
+            margin-bottom: 5px;
+            border-radius: 3px;
+        }
+        .customer-info {
+            flex: 1;
+        }
+        .customer-name {
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .customer-email {
+            font-size: 11px;
+            color: #666;
+        }
+        .remove-customer-btn {
+            padding: 4px 10px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .remove-customer-btn:hover {
+            background: #cc0000;
+        }
+        .add-customer-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .add-customer-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .customer-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+        .add-customer-btn {
+            padding: 8px 16px;
+            background: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .add-customer-btn:hover {
+            background: #e55a00;
+        }
+        .pricelist-actions {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .pricelist-btn {
+            padding: 10px 20px;
+            background: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .pricelist-btn:hover {
+            background: #e55a00;
+        }
+        .pricelist-btn.secondary {
+            background: #666;
+        }
+        .pricelist-btn.secondary:hover {
+            background: #555;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .alert.show {
+            display: block;
+        }
+        .price-preview {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .price-preview strong {
+            color: #ff6600;
+        }
+    </style>
+</head>
+<body>
+    <div class="pricelist-container">
+        <div class="pricelist-header">
+            <h1>Price List Management</h1>
+            <p style="margin: 5px 0 0 0; font-size: 12px;">Shah Distributors Worldwide - Customer Tier Pricing</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div class="pricelist-actions">
+            <button class="pricelist-btn" onclick="refreshData()">🔄 Refresh</button>
+            <button class="pricelist-btn secondary" onclick="window.location.href='admin.html'">← Back to Admin</button>
+        </div>
+
+        <!-- Bronze Tier -->
+        <div class="tier-section">
+            <div class="tier-header">
+                <div>
+                    <span class="tier-name tier-bronze">🥉 Bronze Tier</span>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                        Product-specific markups managed via Excel
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="save-markup-btn" onclick="exportTierPriceList('bronze')">📊 Export to Excel</button>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="bronze-file-input" accept=".xlsx,.xls,.csv" onchange="importTierPriceList('bronze', event)" style="display: none;">
+                        <label for="bronze-file-input" class="save-markup-btn" style="cursor: pointer; margin: 0;">📤 Import from Excel</label>
+                    </div>
+                </div>
+            </div>
+            <div class="customers-list">
+                <h4>Customers in Bronze Tier:</h4>
+                <div id="bronze-customers">
+                    <div class="loading">Loading...</div>
+                </div>
+                <div class="add-customer-section">
+                    <div class="add-customer-form">
+                        <input type="text" id="bronze-customer-email" class="customer-input" placeholder="Enter customer email">
+                        <button class="add-customer-btn" onclick="addCustomer('bronze')">Add Customer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Silver Tier -->
+        <div class="tier-section">
+            <div class="tier-header">
+                <div>
+                    <span class="tier-name tier-silver">🥈 Silver Tier</span>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                        Product-specific markups managed via Excel
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="save-markup-btn" onclick="exportTierPriceList('silver')">📊 Export to Excel</button>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="silver-file-input" accept=".xlsx,.xls,.csv" onchange="importTierPriceList('silver', event)" style="display: none;">
+                        <label for="silver-file-input" class="save-markup-btn" style="cursor: pointer; margin: 0;">📤 Import from Excel</label>
+                    </div>
+                </div>
+            </div>
+            <div class="customers-list">
+                <h4>Customers in Silver Tier:</h4>
+                <div id="silver-customers">
+                    <div class="loading">Loading...</div>
+                </div>
+                <div class="add-customer-section">
+                    <div class="add-customer-form">
+                        <input type="text" id="silver-customer-email" class="customer-input" placeholder="Enter customer email">
+                        <button class="add-customer-btn" onclick="addCustomer('silver')">Add Customer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gold Tier -->
+        <div class="tier-section">
+            <div class="tier-header">
+                <div>
+                    <span class="tier-name tier-gold">🥇 Gold Tier</span>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                        Product-specific markups managed via Excel
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="save-markup-btn" onclick="exportTierPriceList('gold')">📊 Export to Excel</button>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="gold-file-input" accept=".xlsx,.xls,.csv" onchange="importTierPriceList('gold', event)" style="display: none;">
+                        <label for="gold-file-input" class="save-markup-btn" style="cursor: pointer; margin: 0;">📤 Import from Excel</label>
+                    </div>
+                </div>
+            </div>
+            <div class="customers-list">
+                <h4>Customers in Gold Tier:</h4>
+                <div id="gold-customers">
+                    <div class="loading">Loading...</div>
+                </div>
+                <div class="add-customer-section">
+                    <div class="add-customer-form">
+                        <input type="text" id="gold-customer-email" class="customer-input" placeholder="Enter customer email">
+                        <button class="add-customer-btn" onclick="addCustomer('gold')">Add Customer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script>
+        let tierData = {
+            bronze: { markups: {}, customers: [] },
+            silver: { markups: {}, customers: [] },
+            gold: { markups: {}, customers: [] }
+        };
+
+        // Load tier data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTierData();
+        });
+
+        async function loadTierData() {
+            const startTime = Date.now();
+            
+            // Show loading state only if not already loaded
+            ['bronze', 'silver', 'gold'].forEach(tier => {
+                const container = document.getElementById(`${tier}-customers`);
+                if (container && !container.querySelector('.customer-item')) {
+                    container.innerHTML = '<div class="loading">Loading...</div>';
+                }
+            });
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/admin/pricelist/tiers', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                    cache: 'no-cache',
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const loadTime = Date.now() - startTime;
+                console.log(`Tier data loaded in ${loadTime}ms`);
+                
+                if (data.success) {
+                    tierData = data.tiers;
+                    // Render immediately without waiting
+                    renderTiers();
+                } else {
+                    showAlert('Error loading tier data: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error loading tier data:', error);
+                showAlert('Error connecting to server. Make sure the server is running.', 'error');
+                ['bronze', 'silver', 'gold'].forEach(tier => {
+                    const container = document.getElementById(`${tier}-customers`);
+                    if (container) {
+                        container.innerHTML = '<div style="color: #ff4444; font-size: 12px; padding: 10px;">Error loading customers</div>';
+                    }
+                });
+            }
+        }
+
+        function renderTiers() {
+            // Render customers immediately (no delay)
+            renderCustomers('bronze', tierData.bronze.customers || []);
+            renderCustomers('silver', tierData.silver.customers || []);
+            renderCustomers('gold', tierData.gold.customers || []);
+        }
+
+        function renderCustomers(tier, customers) {
+            const container = document.getElementById(`${tier}-customers`);
+            if (!container) return;
+            
+            // Quick check - if already showing correct content, skip
+            const currentCount = container.querySelectorAll('.customer-item').length;
+            if (currentCount === customers.length && customers.length > 0) {
+                return; // Already rendered correctly
+            }
+            
+            // Clear container quickly
+            container.textContent = '';
+            
+            if (customers.length === 0) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.style.cssText = 'color: #999; font-size: 12px; padding: 10px;';
+                emptyDiv.textContent = 'No customers in this tier';
+                container.appendChild(emptyDiv);
+                return;
+            }
+
+            // For small lists, use innerHTML (faster for < 50 items)
+            if (customers.length < 50) {
+                container.innerHTML = customers.map(customer => `
+                    <div class="customer-item">
+                        <div class="customer-info">
+                            <div class="customer-name">${customer.name || 'Unknown'}</div>
+                            <div class="customer-email">${customer.email}</div>
+                        </div>
+                        <button class="remove-customer-btn" onclick="removeCustomer('${tier}', '${customer.email}')">Remove</button>
+                    </div>
+                `).join('');
+                return;
+            }
+
+            // For large lists, use document fragment
+            const fragment = document.createDocumentFragment();
+            
+            customers.forEach(customer => {
+                const item = document.createElement('div');
+                item.className = 'customer-item';
+                
+                const info = document.createElement('div');
+                info.className = 'customer-info';
+                
+                const name = document.createElement('div');
+                name.className = 'customer-name';
+                name.textContent = customer.name || 'Unknown';
+                
+                const email = document.createElement('div');
+                email.className = 'customer-email';
+                email.textContent = customer.email;
+                
+                info.appendChild(name);
+                info.appendChild(email);
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-customer-btn';
+                removeBtn.textContent = 'Remove';
+                removeBtn.onclick = () => removeCustomer(tier, customer.email);
+                
+                item.appendChild(info);
+                item.appendChild(removeBtn);
+                fragment.appendChild(item);
+            });
+            
+            container.appendChild(fragment);
+        }
+
+        async function exportTierPriceList(tier) {
+            try {
+                const response = await fetch(`http://localhost:3000/api/admin/pricelist/tiers/${tier}/export`);
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${tier}_tier_pricelist_${new Date().toISOString().split('T')[0]}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    showAlert(`${tier.charAt(0).toUpperCase() + tier.slice(1)} tier price list exported successfully!`, 'success');
+                } else {
+                    const error = await response.json();
+                    showAlert('Error exporting: ' + (error.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error exporting tier price list:', error);
+                showAlert('Error exporting price list. Please try again.', 'error');
+            }
+        }
+
+        async function importTierPriceList(tier, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const XLSX = window.XLSX;
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+                    // Process imported data
+                    const markups = jsonData.map(row => {
+                        const productId = parseInt(row.ID || row.id);
+                        const markup = parseFloat(row['Markup %'] || row['Markup'] || 0);
+                        
+                        if (productId && !isNaN(markup)) {
+                            return { productId, markup };
+                        }
+                        return null;
+                    }).filter(item => item !== null);
+
+                    if (markups.length === 0) {
+                        showAlert('No valid markups found in the file. Make sure the file has ID and Markup % columns.', 'error');
+                        event.target.value = '';
+                        return;
+                    }
+
+                    // Send to server
+                    const response = await fetch(`http://localhost:3000/api/admin/pricelist/tiers/${tier}/import`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ markups }),
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        showAlert(`Successfully imported ${data.count} product markups for ${tier} tier!`, 'success');
+                        event.target.value = '';
+                    } else {
+                        showAlert('Error importing: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                } catch (error) {
+                    console.error('Error importing tier price list:', error);
+                    showAlert('Error importing file. Please check the format and try again.', 'error');
+                    event.target.value = '';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function addCustomer(tier) {
+            const emailInput = document.getElementById(`${tier}-customer-email`);
+            const email = emailInput.value.trim();
+            
+            if (!email) {
+                showAlert('Please enter a customer email', 'error');
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                showAlert('Please enter a valid email address', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/admin/pricelist/tiers/${tier}/customers`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email }),
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    emailInput.value = '';
+                    await loadTierData(); // Reload to get updated customer list
+                    showAlert('Customer added successfully!', 'success');
+                } else {
+                    showAlert('Error adding customer: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error adding customer:', error);
+                showAlert('Error adding customer. Please try again.', 'error');
+            }
+        }
+
+        async function removeCustomer(tier, email) {
+            if (!confirm(`Remove ${email} from ${tier} tier?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/admin/pricelist/tiers/${tier}/customers`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email }),
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    await loadTierData(); // Reload to get updated customer list
+                    showAlert('Customer removed successfully!', 'success');
+                } else {
+                    showAlert('Error removing customer: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error removing customer:', error);
+                showAlert('Error removing customer. Please try again.', 'error');
+            }
+        }
+
+        function refreshData() {
+            loadTierData();
+            showAlert('Data refreshed!', 'success');
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            alertContainer.innerHTML = `<div class="alert ${type} show">${message}</div>`;
+            
+            setTimeout(() => {
+                const alert = alertContainer.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => alert.remove(), 300);
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
+

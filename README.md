@@ -105,14 +105,37 @@ See `README_GOOGLE_AUTH.md` for detailed setup and management instructions.
 - **Payments**: Stripe Checkout
 - **Storage**: LocalStorage (cart), JSON file (price lists)
 
+## Admin Dashboard
+
+Access the admin dashboard at `http://localhost:3000/admin.html` to:
+- View all orders
+- See order statistics (total orders, revenue, today's orders, pending orders)
+- Export orders to Excel (.xlsx) format
+- Export orders to CSV format
+- Refresh order data in real-time
+
+### Admin Features:
+- **Order Management**: View all orders with details including customer info, items, totals, and payment status
+- **Excel Export**: Download all orders as an Excel file for easy management in Excel/Google Sheets
+- **CSV Export**: Download orders as CSV for compatibility with any spreadsheet software
+- **Real-time Stats**: See total orders, revenue, today's orders, and pending orders at a glance
+
 ## API Endpoints
 
+### Public Endpoints
 - `POST /auth/google` - Authenticate with Google
 - `GET /api/user/:userId/pricelist` - Get user price list
 - `POST /api/user/:userId/pricelist` - Update user price list
 - `GET /api/config` - Get configuration (Google Client ID)
 - `POST /create-checkout-session` - Create Stripe checkout session
 - `GET /verify-session/:sessionId` - Verify payment session
+- `POST /api/order` - Create order (cash on delivery)
+- `GET /api/invoice/:orderId` - Download invoice PDF
+
+### Admin Endpoints
+- `GET /api/admin/orders` - Get all orders (for admin dashboard)
+- `POST /api/admin/orders/:orderId/fulfill` - Mark order as fulfilled
+- `GET /api/admin/orders/export/excel` - Export all orders as Excel file
 
 ## Browser Compatibility
 

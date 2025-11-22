@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management - Shah Distributors Worldwide</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .inventory-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .inventory-header {
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .inventory-header h1 {
+            margin: 0;
+            color: #ff6600;
+        }
+        .inventory-actions {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .inventory-btn {
+            padding: 10px 20px;
+            background: #ff6600;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .inventory-btn:hover {
+            background: #e55a00;
+        }
+        .inventory-btn.secondary {
+            background: #666;
+        }
+        .inventory-btn.secondary:hover {
+            background: #555;
+        }
+        .inventory-btn.success {
+            background: #4CAF50;
+        }
+        .inventory-btn.success:hover {
+            background: #45a049;
+        }
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .file-input-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .file-input-label:hover {
+            background: #45a049;
+        }
+        .inventory-table {
+            width: 100%;
+            background: white;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .inventory-table th {
+            background: #1a1a1a;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .inventory-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 11px;
+        }
+        .inventory-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        .stock-input {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 11px;
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+        .stock-input::-webkit-inner-spin-button,
+        .stock-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .stock-input:focus {
+            outline: none;
+            border-color: #ff6600;
+        }
+        .stock-low {
+            color: #ff6600;
+            font-weight: bold;
+        }
+        .stock-out {
+            color: #ff0000;
+            font-weight: bold;
+        }
+        .stock-ok {
+            color: #4CAF50;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .no-products {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .alert.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="inventory-container">
+        <div class="inventory-header">
+            <h1>Inventory Management</h1>
+            <p style="margin: 5px 0 0 0; font-size: 12px;">Shah Distributors Worldwide</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div class="inventory-actions">
+            <button class="inventory-btn" onclick="refreshInventory()">🔄 Refresh Inventory</button>
+            <button class="inventory-btn success" onclick="exportToExcel()">📊 Export to Excel</button>
+            <button class="inventory-btn secondary" onclick="downloadTemplate()">📥 Download Template</button>
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" onchange="handleFileImport(event)">
+                <label for="fileInput" class="file-input-label">📤 Import from Excel</label>
+            </div>
+            <button class="inventory-btn" onclick="saveInventory()">💾 Save Changes</button>
+            <button class="inventory-btn secondary" onclick="window.location.href='admin.html'">← Back to Admin</button>
+        </div>
+
+        <div id="inventoryContainer">
+            <div class="loading">Loading inventory...</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script>
+        let inventory = [];
+        let originalInventory = [];
+
+        // Load inventory on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadInventory();
+        });
+
+        async function loadInventory() {
+            try {
+                const startTime = Date.now();
+                const response = await fetch('http://localhost:3000/api/admin/inventory', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const loadTime = Date.now() - startTime;
+                console.log(`Inventory loaded in ${loadTime}ms`);
+                
+                if (data.success) {
+                    inventory = data.inventory || [];
+                    originalInventory = JSON.parse(JSON.stringify(inventory));
+                    renderInventory();
+                } else {
+                    showAlert('Error loading inventory: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+                showAlert('Error connecting to server. Make sure the server is running.', 'error');
+                document.getElementById('inventoryContainer').innerHTML = 
+                    '<div class="no-products">Error: ' + error.message + '</div>';
+            }
+        }
+
+        function renderInventory() {
+            const container = document.getElementById('inventoryContainer');
+            const startTime = Date.now();
+            
+            if (inventory.length === 0) {
+                container.innerHTML = '<div class="no-products">No products found.</div>';
+                return;
+            }
+
+            // Use document fragment for better performance
+            const table = document.createElement('table');
+            table.className = 'inventory-table';
+            
+            // Create header
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                        <tr>
+                            <th>ID</th>
+                            <th>SKU</th>
+                            <th>Product Name</th>
+                            <th>Current Stock</th>
+                            <th>Update Stock</th>
+                            <th>Original Cost</th>
+                            <th>Price</th>
+                            <th>Clearance</th>
+                            <th>Original Price</th>
+                            <th>Units/Pack</th>
+                        </tr>
+            `;
+            table.appendChild(thead);
+            
+            // Create tbody
+            const tbody = document.createElement('tbody');
+            
+            // Render products in batches for better performance
+            const batchSize = 50;
+            let currentIndex = 0;
+            
+            function renderBatch() {
+                const endIndex = Math.min(currentIndex + batchSize, inventory.length);
+                
+                for (let i = currentIndex; i < endIndex; i++) {
+                    const product = inventory[i];
+                    const stockClass = product.stock === undefined || product.stock === null 
+                        ? 'stock-ok' 
+                        : product.stock === 0 
+                            ? 'stock-out' 
+                            : product.stock < 10 
+                                ? 'stock-low' 
+                                : 'stock-ok';
+                    
+                    const stockDisplay = product.stock !== undefined && product.stock !== null 
+                        ? product.stock 
+                        : 'N/A';
+
+                    const row = document.createElement('tr');
+                    const originalCost = product.originalCost || product.price || 0;
+                    row.innerHTML = `
+                        <td>${product.id}</td>
+                        <td><strong>${product.sku}</strong>${product.subSku ? '<br><small>' + product.subSku + '</small>' : ''}</td>
+                        <td>${product.name}</td>
+                        <td class="${stockClass}">${stockDisplay}</td>
+                        <td>
+                            <input type="number" 
+                                   class="stock-input" 
+                                   id="stock-${product.id}" 
+                                   value="${product.stock !== undefined && product.stock !== null ? product.stock : ''}" 
+                                   min="0"
+                                   onchange="updateStock(${product.id}, this.value)">
+                        </td>
+                        <td>
+                            <input type="number" 
+                                   class="stock-input" 
+                                   id="originalCost-${product.id}" 
+                                   value="${originalCost}" 
+                                   min="0"
+                                   step="0.01"
+                                   onchange="updateOriginalCost(${product.id}, this.value)">
+                        </td>
+                        <td>$${product.price.toFixed(2)}</td>
+                        <td>${product.isClearance ? 'Yes' : 'No'}</td>
+                        <td>${product.originalPrice ? '$' + product.originalPrice.toFixed(2) : '-'}</td>
+                        <td>${product.unitsPerPack || 1}</td>
+                    `;
+                    tbody.appendChild(row);
+                }
+                
+                currentIndex = endIndex;
+                
+                if (currentIndex < inventory.length) {
+                    // Render next batch asynchronously
+                    setTimeout(renderBatch, 0);
+                } else {
+                    table.appendChild(tbody);
+                    container.innerHTML = '';
+                    container.appendChild(table);
+                    const renderTime = Date.now() - startTime;
+                    console.log(`Inventory rendered in ${renderTime}ms`);
+                }
+            }
+            
+            renderBatch();
+        }
+
+        function updateStock(productId, newStock) {
+            const product = inventory.find(p => p.id === productId);
+            if (product) {
+                product.stock = newStock === '' ? null : parseInt(newStock);
+            }
+        }
+
+        function updateOriginalCost(productId, newCost) {
+            const product = inventory.find(p => p.id === productId);
+            if (product) {
+                product.originalCost = newCost === '' ? null : parseFloat(newCost);
+            }
+        }
+
+        async function saveInventory() {
+            try {
+                const response = await fetch('http://localhost:3000/api/admin/inventory', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ inventory }),
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('Inventory updated successfully!', 'success');
+                    originalInventory = JSON.parse(JSON.stringify(inventory));
+                } else {
+                    showAlert('Error saving inventory: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                console.error('Error saving inventory:', error);
+                showAlert('Error saving inventory. Please try again.', 'error');
+            }
+        }
+
+        function refreshInventory() {
+            document.getElementById('inventoryContainer').innerHTML = '<div class="loading">Refreshing inventory...</div>';
+            loadInventory();
+        }
+
+        function exportToExcel() {
+            if (inventory.length === 0) {
+                showAlert('No inventory to export', 'error');
+                return;
+            }
+
+            // Prepare data for Excel
+            const excelData = inventory.map(product => ({
+                'ID': product.id,
+                'SKU': product.sku,
+                'Sub-SKU': product.subSku || '',
+                'Product Name': product.name,
+                'Description': product.description || '',
+                'Original Cost': product.originalCost || product.price || '',
+                'Price': product.price,
+                'Original Price': product.originalPrice || '',
+                'Stock': product.stock !== undefined && product.stock !== null ? product.stock : '',
+                'Is Clearance': product.isClearance ? 'Yes' : 'No',
+                'Units Per Pack': product.unitsPerPack || 1,
+            }));
+
+            // Create workbook
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Inventory');
+
+            // Generate filename with date
+            const filename = `inventory_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+            // Download
+            XLSX.writeFile(wb, filename);
+            showAlert('Inventory exported successfully!', 'success');
+        }
+
+        function downloadTemplate() {
+            // Create template with sample data
+            const templateData = [
+                {
+                    'ID': 1,
+                    'SKU': 'GM-001',
+                    'Sub-SKU': 'GM-001-A',
+                    'Product Name': 'Sample Product',
+                    'Description': 'Product description',
+                    'Original Cost': 50.00,
+                    'Price': 99.99,
+                    'Original Price': 129.99,
+                    'Stock': 50,
+                    'Is Clearance': 'No',
+                    'Units Per Pack': 1,
+                },
+            ];
+
+            const ws = XLSX.utils.json_to_sheet(templateData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Inventory Template');
+
+            XLSX.writeFile(wb, 'inventory_template.xlsx');
+            showAlert('Template downloaded! Fill it out and import to update inventory.', 'success');
+        }
+
+        async function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+                    // Validate and process imported data
+                    const processedData = jsonData.map(row => {
+                        const productId = parseInt(row.ID || row.id);
+                        const product = inventory.find(p => p.id === productId);
+                        
+                        if (product) {
+                            return {
+                                ...product,
+                                stock: row.Stock !== undefined && row.Stock !== '' ? parseInt(row.Stock) : null,
+                                originalCost: row['Original Cost'] !== undefined && row['Original Cost'] !== '' 
+                                    ? parseFloat(row['Original Cost']) 
+                                    : (product.originalCost || product.price),
+                                price: row.Price !== undefined ? parseFloat(row.Price) : product.price,
+                                originalPrice: row['Original Price'] !== undefined && row['Original Price'] !== '' 
+                                    ? parseFloat(row['Original Price']) 
+                                    : product.originalPrice,
+                                isClearance: row['Is Clearance'] === 'Yes' || row['Is Clearance'] === true,
+                            };
+                        }
+                        return null;
+                    }).filter(p => p !== null);
+
+                    if (processedData.length === 0) {
+                        showAlert('No valid products found in the imported file. Make sure the IDs match existing products.', 'error');
+                        return;
+                    }
+
+                    // Update inventory
+                    processedData.forEach(updatedProduct => {
+                        const index = inventory.findIndex(p => p.id === updatedProduct.id);
+                        if (index !== -1) {
+                            inventory[index] = updatedProduct;
+                        }
+                    });
+
+                    renderInventory();
+                    showAlert(`Successfully imported ${processedData.length} product(s)! Click "Save Changes" to apply.`, 'success');
+                    
+                    // Reset file input
+                    event.target.value = '';
+                } catch (error) {
+                    console.error('Error importing file:', error);
+                    showAlert('Error importing file. Please check the format and try again.', 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            alertContainer.innerHTML = `<div class="alert ${type} show">${message}</div>`;
+            
+            setTimeout(() => {
+                const alert = alertContainer.querySelector('.alert');
+                if (alert) {
+                    alert.classList.remove('show');
+                    setTimeout(() => alert.remove(), 300);
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
+
