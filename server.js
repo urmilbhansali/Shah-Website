@@ -166,10 +166,10 @@ function calculateTierPrice(originalCost, tier, productId) {
 app.use(cors());
 app.use(express.json());
 
-// Serve login.html as default landing page (before static files)
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'login.html'));
-});
+// Serve index.html as default landing page (login requirement paused)
+// app.get('/', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'login.html'));
+// });
 
 app.use(express.static('.'));
 
@@ -601,7 +601,7 @@ function generateInvoicePDF(order) {
             yPos += 20;
             
             if (order.shippingMethod === 'pickup') {
-                doc.text('Pickup Location: 123 Main Street, City, State 12345', 50, yPos);
+                doc.text('Pickup Location: 47 Roselle St, Mineola, NY 11501', 50, yPos);
             }
             
             // Footer
@@ -637,7 +637,7 @@ async function sendInvoiceEmail(order, pdfBuffer) {
                     <p><strong>Total Amount:</strong> $${(order.subtotal + order.shippingCost).toFixed(2)}</p>
                     <p><strong>Payment Method:</strong> ${order.paymentMethod === 'card' ? 'Credit/Debit Card' : 'Cash on Delivery'}</p>
                     ${order.shippingMethod === 'pickup' 
-                        ? '<p><strong>Pickup Location:</strong> 123 Main Street, City, State 12345</p>'
+                        ? '<p><strong>Pickup Location:</strong> 47 Roselle St, Mineola, NY 11501</p>'
                         : `<p><strong>Shipping Address:</strong><br>${order.shippingAddress?.name || ''}<br>${order.shippingAddress?.address || ''}<br>${order.shippingAddress?.city || ''}, ${order.shippingAddress?.state || ''} ${order.shippingAddress?.zip || ''}</p>`
                     }
                     <p>Please find your invoice attached to this email.</p>
@@ -806,6 +806,31 @@ app.post('/create-checkout-session', async (req, res) => {
     } catch (error) {
         console.error('Error creating checkout session:', error);
         res.status(500).json({ error: error.message });
+    }
+});
+
+// Get user orders by email
+app.get('/api/user/orders', (req, res) => {
+    try {
+        const { email } = req.query;
+        
+        if (!email) {
+            return res.status(400).json({ success: false, error: 'Email is required' });
+        }
+        
+        // Convert orders object to array and filter by email
+        const ordersArray = Object.values(orders).filter(order => 
+            order.shippingEmail && order.shippingEmail.toLowerCase() === email.toLowerCase()
+        );
+        
+        res.json({
+            success: true,
+            orders: ordersArray,
+            count: ordersArray.length,
+        });
+    } catch (error) {
+        console.error('Error fetching user orders:', error);
+        res.status(500).json({ success: false, error: error.message });
     }
 });
 

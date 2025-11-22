@@ -16,6 +16,7 @@
             <nav class="nav">
                 <a href="index.html">Home</a>
                 <a href="about.html">About Us</a>
+                <a href="profile.html" style="color: #ff6600;">My Profile</a>
                 <a href="admin.html" style="color: #ff6600;">Admin</a>
             </nav>
             <div class="header-right">
@@ -102,10 +103,8 @@
                         <div class="pickup-location">
                             <p style="font-size: 11px; color: #666; margin: 10px 0 5px 0;"><strong>Pickup Location:</strong></p>
                             <p style="font-size: 10px; color: #666; line-height: 1.4;">
-                                123 Main Street<br>
-                                City, State 12345<br>
-                                Phone: (555) 123-4567<br>
-                                Hours: Mon-Fri 9AM-6PM
+                                47 Roselle St<br>
+                                Mineola, NY 11501
                             </p>
                         </div>
                     </div>
@@ -118,7 +117,7 @@
                     <div class="live-cart-total">
                         <strong>Total: $<span id="liveCartTotal">0.00</span></strong>
                     </div>
-                    <button class="checkout-btn" onclick="checkout()">Checkout</button>
+                    <button class="checkout-btn" onclick="checkout()">Proceed to Checkout</button>
                 </div>
             </div>
         </div>
@@ -165,6 +164,40 @@
             <div class="thank-you-actions">
                 <button class="download-invoice-btn" id="downloadInvoiceBtn" onclick="downloadInvoice()">Download Invoice</button>
                 <button class="continue-shopping-btn" onclick="continueShopping()">Continue Shopping</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upsell Modal 1: Frequently Bought Items -->
+    <div class="upsell-modal" id="frequentlyBoughtModal">
+        <div class="upsell-modal-content">
+            <div class="upsell-header">
+                <h2>You frequently also bought these items</h2>
+                <button class="close-upsell" onclick="skipFrequentlyBought()">×</button>
+            </div>
+            <div class="upsell-body" id="frequentlyBoughtBody">
+                <!-- Items will be dynamically loaded -->
+            </div>
+            <div class="upsell-footer">
+                <button class="skip-btn" onclick="skipFrequentlyBought()">Skip</button>
+                <button class="continue-btn" onclick="continueToClearanceUpsell()">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upsell Modal 2: Clearance Items -->
+    <div class="upsell-modal" id="clearanceUpsellModal">
+        <div class="upsell-modal-content">
+            <div class="upsell-header">
+                <h2>Clearance items you may like</h2>
+                <button class="close-upsell" onclick="skipClearanceUpsell()">×</button>
+            </div>
+            <div class="upsell-body" id="clearanceUpsellBody">
+                <!-- Items will be dynamically loaded -->
+            </div>
+            <div class="upsell-footer">
+                <button class="skip-btn" onclick="skipClearanceUpsell()">Skip</button>
+                <button class="continue-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
             </div>
         </div>
     </div>

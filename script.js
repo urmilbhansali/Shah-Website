@@ -574,25 +574,32 @@ async function handleGoogleSignIn(response) {
     }
 }
 
-// Check if user is authenticated, redirect to login if not
+// Check if user is authenticated (login requirement paused)
 function checkUserSession() {
     const savedUser = localStorage.getItem('user');
-    if (!savedUser) {
-        // User not logged in, redirect to login page
-        window.location.href = 'login.html';
-        return false;
+    // Login requirement paused - no redirect
+    // if (!savedUser) {
+    //     // User not logged in, redirect to login page
+    //     window.location.href = 'login.html';
+    //     return false;
+    // }
+    
+    if (savedUser) {
+        const savedPriceList = localStorage.getItem('userPriceList');
+        currentUser = JSON.parse(savedUser);
+        if (savedPriceList) {
+            userPriceList = JSON.parse(savedPriceList);
+        }
+        updateUserUI();
+        
+        // Fetch latest price list from server
+        fetchUserPriceList();
+        return true;
     }
     
-    const savedPriceList = localStorage.getItem('userPriceList');
-    currentUser = JSON.parse(savedUser);
-    if (savedPriceList) {
-        userPriceList = JSON.parse(savedPriceList);
-    }
+    // User not logged in, but continue without authentication
     updateUserUI();
-    
-    // Fetch latest price list from server
-    fetchUserPriceList();
-    return true;
+    return false;
 }
 
 // Fetch user price list from server
@@ -1238,42 +1245,336 @@ function toggleShippingFields() {
     }
 }
 
-// Checkout function
-function checkout() {
-    if (cart.length === 0) {
-        alert('Your cart is empty!');
-        return;
-    }
-
-    // Get shipping info from cart panel
-    const shippingMethod = document.getElementById('cartShippingMethod')?.value || 'standard';
-    const shippingEmail = document.getElementById('cartShippingEmail')?.value || '';
-    const shippingName = document.getElementById('cartShippingName')?.value || '';
-    const shippingAddress = document.getElementById('cartShippingAddress')?.value || '';
-    const shippingCity = document.getElementById('cartShippingCity')?.value || '';
-    const shippingState = document.getElementById('cartShippingState')?.value || '';
-    const shippingZip = document.getElementById('cartShippingZip')?.value || '';
-    
-    // Validate email (always required)
-    if (!shippingEmail || !isValidEmail(shippingEmail)) {
-        alert('Please enter a valid email address.');
-        document.getElementById('cartShippingEmail')?.focus();
-        return;
-    }
-    
-    // Validate shipping address (only required if not pickup)
-    if (shippingMethod !== 'pickup') {
-        if (!shippingName || !shippingAddress || !shippingCity || !shippingState || !shippingZip) {
-            alert('Please fill in all shipping address fields in the cart before checkout.');
-            return;
+// Analyze cart history to find frequently bought items
+function getFrequentlyBoughtItems() {
+    try {
+        const cartHistory = JSON.parse(localStorage.getItem('cartHistory') || '[]');
+        const currentCartIds = new Set(cart.map(item => item.id));
+        
+        if (cartHistory.length === 0) {
+            return [];
         }
+        
+        // Count item frequencies across all cart history
+        const itemFrequency = {};
+        const itemCoOccurrence = {}; // Items bought together with current cart items
+        
+        cartHistory.forEach(historyCart => {
+            const historyItemIds = historyCart.items.map(item => item.id);
+            
+            // Count individual item frequencies
+            historyItemIds.forEach(itemId => {
+                if (!currentCartIds.has(itemId)) {
+                    itemFrequency[itemId] = (itemFrequency[itemId] || 0) + 1;
+                }
+            });
+            
+            // Count co-occurrence with current cart items
+            historyItemIds.forEach(historyItemId => {
+                if (!currentCartIds.has(historyItemId)) {
+                    historyItemIds.forEach(otherItemId => {
+                        if (currentCartIds.has(otherItemId)) {
+                            itemCoOccurrence[historyItemId] = (itemCoOccurrence[historyItemId] || 0) + 1;
+                        }
+                    });
+                }
+            });
+        });
+        
+        // Combine scores (prioritize co-occurrence, then frequency)
+        const scoredItems = Object.keys(itemFrequency).map(itemId => {
+            const product = products.find(p => p.id === parseInt(itemId));
+            if (!product) return null;
+            
+            const frequency = itemFrequency[itemId] || 0;
+            const coOccurrence = itemCoOccurrence[itemId] || 0;
+            const score = (coOccurrence * 2) + frequency; // Co-occurrence weighted more
+            
+            return {
+                product: product,
+                score: score,
+                frequency: frequency,
+                coOccurrence: coOccurrence
+            };
+        }).filter(item => item !== null);
+        
+        // Sort by score and return top 3
+        scoredItems.sort((a, b) => b.score - a.score);
+        return scoredItems.slice(0, 3).map(item => item.product);
+    } catch (error) {
+        console.error('Error analyzing cart history:', error);
+        return [];
+    }
+}
+
+// Get clearance items user may have purchased
+function getClearanceUpsells() {
+    try {
+        const cartHistory = JSON.parse(localStorage.getItem('cartHistory') || '[]');
+        const currentCartIds = new Set(cart.map(item => item.id));
+        
+        // Get all clearance items
+        const clearanceItems = products.filter(p => p.isClearance && !currentCartIds.has(p.id));
+        
+        if (clearanceItems.length === 0) {
+            return [];
+        }
+        
+        // Check if user has purchased any of these items before
+        const purchasedItemIds = new Set();
+        cartHistory.forEach(historyCart => {
+            historyCart.items.forEach(item => {
+                purchasedItemIds.add(item.id);
+            });
+        });
+        
+        // Prioritize clearance items user has purchased before
+        const scoredItems = clearanceItems.map(product => {
+            const hasPurchased = purchasedItemIds.has(product.id);
+            return {
+                product: product,
+                score: hasPurchased ? 2 : 1, // Higher score if purchased before
+                hasPurchased: hasPurchased
+            };
+        });
+        
+        // Sort by score (purchased items first), then by price
+        scoredItems.sort((a, b) => {
+            if (b.score !== a.score) return b.score - a.score;
+            return a.product.price - b.product.price;
+        });
+        
+        return scoredItems.slice(0, 5).map(item => item.product);
+    } catch (error) {
+        console.error('Error getting clearance upsells:', error);
+        return [];
+    }
+}
+
+// Show upsell modals
+function showUpsells() {
+    const frequentlyBought = getFrequentlyBoughtItems();
+    const clearanceUpsells = getClearanceUpsells();
+    
+    // Show frequently bought items first if available
+    if (frequentlyBought.length > 0) {
+        showFrequentlyBoughtUpsell(frequentlyBought);
+    } else if (clearanceUpsells.length > 0) {
+        // Skip to clearance if no frequently bought items
+        showClearanceUpsell(clearanceUpsells);
+    } else {
+        // No upsells, proceed directly to checkout
+        proceedToCheckout();
+    }
+}
+
+// Show frequently bought items upsell
+function showFrequentlyBoughtUpsell(items) {
+    const modal = document.getElementById('frequentlyBoughtModal');
+    const body = document.getElementById('frequentlyBoughtBody');
+    
+    body.innerHTML = items.map(product => {
+        const productPrice = getProductPrice(product);
+        const productOriginalPrice = getProductOriginalPrice(product);
+        const isOnClearance = product.isClearance || (userPriceList && userPriceList[product.id] && userPriceList[product.id].isClearance);
+        
+        let priceDisplay = `$${productPrice.toFixed(2)}`;
+        if (isOnClearance && productOriginalPrice) {
+            const discountPercent = Math.round(((productOriginalPrice - productPrice) / productOriginalPrice) * 100);
+            priceDisplay = `
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="text-decoration: line-through; color: #999; font-size: 12px;">$${productOriginalPrice.toFixed(2)}</span>
+                    <span style="color: #ff6600; font-weight: bold;">$${productPrice.toFixed(2)}</span>
+                    <span style="background: #ff6600; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">-${discountPercent}%</span>
+                </div>
+            `;
+        }
+        
+        return `
+            <div class="upsell-item" data-product-id="${product.id}">
+                <div class="upsell-item-info">
+                    <h4>${product.name}${isOnClearance ? ' <span style="background: #ff6600; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">CLEARANCE</span>' : ''}</h4>
+                    <p class="upsell-item-description">${product.description}</p>
+                    <div class="upsell-item-price">${priceDisplay}</div>
+                </div>
+                <div class="upsell-item-controls">
+                    <div class="upsell-quantity-controls">
+                        <button class="qty-btn qty-minus" onclick="updateUpsellQuantity('frequentlyBought', ${product.id}, -1)">-</button>
+                        <input type="number" class="qty-input" id="upsell-qty-fb-${product.id}" value="0" min="0" onchange="updateUpsellQuantityManual('frequentlyBought', ${product.id})">
+                        <button class="qty-btn qty-plus" onclick="updateUpsellQuantity('frequentlyBought', ${product.id}, 1)">+</button>
+                    </div>
+                    <button class="add-to-cart-upsell-btn" onclick="addUpsellToCart('frequentlyBought', ${product.id})">Add to Cart</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    modal.classList.add('active');
+}
+
+// Show clearance items upsell
+function showClearanceUpsell(items) {
+    const modal = document.getElementById('clearanceUpsellModal');
+    const body = document.getElementById('clearanceUpsellBody');
+    
+    body.innerHTML = items.map(product => {
+        const productPrice = getProductPrice(product);
+        const productOriginalPrice = getProductOriginalPrice(product);
+        const discountPercent = productOriginalPrice ? Math.round(((productOriginalPrice - productPrice) / productOriginalPrice) * 100) : 0;
+        
+        return `
+            <div class="upsell-item" data-product-id="${product.id}">
+                <div class="upsell-item-info">
+                    <h4>${product.name} <span style="background: #ff6600; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">CLEARANCE</span></h4>
+                    <p class="upsell-item-description">${product.description}</p>
+                    <div class="upsell-item-price">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="text-decoration: line-through; color: #999; font-size: 12px;">$${productOriginalPrice ? productOriginalPrice.toFixed(2) : productPrice.toFixed(2)}</span>
+                            <span style="color: #ff6600; font-weight: bold;">$${productPrice.toFixed(2)}</span>
+                            <span style="background: #ff6600; color: white; padding: 2px 6px; border-radius: 3px; font-size: 10px;">-${discountPercent}%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="upsell-item-controls">
+                    <div class="upsell-quantity-controls">
+                        <button class="qty-btn qty-minus" onclick="updateUpsellQuantity('clearance', ${product.id}, -1)">-</button>
+                        <input type="number" class="qty-input" id="upsell-qty-cl-${product.id}" value="0" min="0" onchange="updateUpsellQuantityManual('clearance', ${product.id})">
+                        <button class="qty-btn qty-plus" onclick="updateUpsellQuantity('clearance', ${product.id}, 1)">+</button>
+                    </div>
+                    <button class="add-to-cart-upsell-btn" onclick="addUpsellToCart('clearance', ${product.id})">Add to Cart</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    modal.classList.add('active');
+}
+
+// Update upsell quantity
+function updateUpsellQuantity(type, productId, change) {
+    const inputId = `upsell-qty-${type === 'frequentlyBought' ? 'fb' : 'cl'}-${productId}`;
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    
+    let currentValue = parseInt(input.value) || 0;
+    let newQuantity = currentValue + change;
+    
+    // Allow going down to 0
+    if (newQuantity < 0) {
+        newQuantity = 0;
     }
     
-    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const shipping = calculateShipping(subtotal, shippingMethod);
-    const total = subtotal + shipping;
+    input.value = newQuantity;
+}
+
+// Update upsell quantity manually
+function updateUpsellQuantityManual(type, productId) {
+    const inputId = `upsell-qty-${type === 'frequentlyBought' ? 'fb' : 'cl'}-${productId}`;
+    const input = document.getElementById(inputId);
+    if (!input) return;
     
+    let newQuantity = parseInt(input.value);
+    if (isNaN(newQuantity) || newQuantity < 0) {
+        input.value = 0;
+        newQuantity = 0;
+    }
+}
+
+// Add upsell item to cart
+function addUpsellToCart(type, productId) {
+    const inputId = `upsell-qty-${type === 'frequentlyBought' ? 'fb' : 'cl'}-${productId}`;
+    const input = document.getElementById(inputId);
+    const quantity = parseInt(input.value) || 0;
+    
+    // Don't add if quantity is 0
+    if (quantity <= 0) {
+        alert('Please select a quantity greater than 0 to add to cart.');
+        return;
+    }
+    
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    
+    const productPrice = getProductPrice(product);
+    
+    // Check if item already in cart
+    const existingItem = cart.find(item => item.id === productId);
+    if (existingItem) {
+        existingItem.quantity += quantity;
+    } else {
+        cart.push({
+            id: product.id,
+            name: product.name,
+            price: productPrice,
+            quantity: quantity,
+            sku: product.sku || '',
+            description: product.description || ''
+        });
+    }
+    
+    // Update product quantities
+    productQuantities[productId] = (productQuantities[productId] || 0) + quantity;
+    
+    // Reset quantity to 0 after adding
+    input.value = 0;
+    
+    // Update UI
+    updateCart();
+    saveCart();
+    renderProducts();
+    
+    // Show confirmation
+    const btn = event.target;
+    const originalText = btn.textContent;
+    btn.textContent = 'Added!';
+    btn.style.background = '#4CAF50';
+    setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '';
+    }, 1000);
+}
+
+// Keep main screen buttons as "Proceed to Checkout" (no changes needed)
+// The checkout modal will show "Confirm Order" in green
+
+// Skip frequently bought upsell
+function skipFrequentlyBought() {
+    const modal = document.getElementById('frequentlyBoughtModal');
+    modal.classList.remove('active');
+    
+    // Show clearance upsell if available
+    const clearanceUpsells = getClearanceUpsells();
+    if (clearanceUpsells.length > 0) {
+        showClearanceUpsell(clearanceUpsells);
+    } else {
+        proceedToCheckout();
+    }
+}
+
+// Continue to clearance upsell
+function continueToClearanceUpsell() {
+    const modal = document.getElementById('frequentlyBoughtModal');
+    modal.classList.remove('active');
+    
+    const clearanceUpsells = getClearanceUpsells();
+    if (clearanceUpsells.length > 0) {
+        showClearanceUpsell(clearanceUpsells);
+    } else {
+        proceedToCheckout();
+    }
+}
+
+// Skip clearance upsell
+function skipClearanceUpsell() {
+    const modal = document.getElementById('clearanceUpsellModal');
+    modal.classList.remove('active');
+    
+    proceedToCheckout();
+}
+
+// Show checkout modal
+function showCheckoutModal(shippingMethod, shippingEmail, shippingName, shippingAddress, shippingCity, shippingState, shippingZip, subtotal, shippingCost) {
+    const total = subtotal + shippingCost;
     const checkoutBody = document.getElementById('checkoutBody');
     const checkoutModal = document.getElementById('checkoutModal');
     
@@ -1295,7 +1596,7 @@ function checkout() {
                 </div>
                 <div class="order-line">
                     <span>Shipping:</span>
-                    <span>$${shipping.toFixed(2)}</span>
+                    <span>$${shippingCost.toFixed(2)}</span>
                 </div>
                 <div class="order-line order-total">
                     <span>Total:</span>
@@ -1310,8 +1611,7 @@ function checkout() {
                 ${shippingMethod === 'pickup' ? `
                     <p><strong>Pickup Order</strong></p>
                     <p>You will pick up your order at our location:</p>
-                    <p>123 Main Street<br>City, State 12345<br>Phone: (555) 123-4567</p>
-                    <p>Hours: Mon-Fri 9AM-6PM</p>
+                    <p>47 Roselle St<br>Mineola, NY 11501</p>
                 ` : `
                     <p><strong>${shippingName}</strong></p>
                     <p>${shippingAddress}</p>
@@ -1353,7 +1653,7 @@ function checkout() {
         
         <div class="checkout-actions">
             <button class="cancel-btn" onclick="closeCheckout()">Cancel</button>
-            <button class="submit-order-btn" onclick="submitOrder()">Place Order</button>
+            <button class="submit-order-btn confirm-order-btn" onclick="submitOrder()">Confirm Order</button>
         </div>
     `;
     
@@ -1361,6 +1661,54 @@ function checkout() {
     setupPaymentToggle();
     
     checkoutModal.classList.add('active');
+}
+
+// Proceed to checkout (original checkout flow)
+function proceedToCheckout() {
+    // Close any open upsell modals
+    document.getElementById('frequentlyBoughtModal')?.classList.remove('active');
+    document.getElementById('clearanceUpsellModal')?.classList.remove('active');
+    
+    // Continue with original checkout flow
+    const shippingMethod = document.getElementById('cartShippingMethod')?.value || 'standard';
+    const shippingEmail = document.getElementById('cartShippingEmail')?.value || '';
+    const shippingName = document.getElementById('cartShippingName')?.value;
+    const shippingAddress = document.getElementById('cartShippingAddress')?.value;
+    const shippingCity = document.getElementById('cartShippingCity')?.value;
+    const shippingState = document.getElementById('cartShippingState')?.value;
+    const shippingZip = document.getElementById('cartShippingZip')?.value;
+    
+    // Validate email (always required)
+    if (!shippingEmail || !isValidEmail(shippingEmail)) {
+        alert('Please enter a valid email address.');
+        document.getElementById('cartShippingEmail')?.focus();
+        return;
+    }
+    
+    // Basic validation (only required if not pickup)
+    if (shippingMethod !== 'pickup') {
+        if (!shippingName || !shippingAddress || !shippingCity || !shippingState || !shippingZip) {
+            alert('Please fill in all shipping address fields in the cart.');
+            return;
+        }
+    }
+    
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const shippingCost = calculateShipping(subtotal, shippingMethod);
+    
+    // Show checkout modal
+    showCheckoutModal(shippingMethod, shippingEmail, shippingName, shippingAddress, shippingCity, shippingState, shippingZip, subtotal, shippingCost);
+}
+
+// Checkout function (now just triggers upsells)
+function checkout() {
+    if (cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
+    }
+    
+    // Show upsells before checkout
+    showUpsells();
 }
 
 // Toggle card details based on payment method
@@ -1449,6 +1797,8 @@ async function submitOrder() {
             const data = await response.json();
             
             if (data.success) {
+                // Save cart to history before clearing
+                saveCartToHistory();
                 // Show thank you page
                 showThankYou(data.orderId, data);
             } else {
@@ -1501,6 +1851,8 @@ async function submitOrder() {
         if (data.orderId) {
             localStorage.setItem('pendingOrderId', data.orderId);
             localStorage.setItem('pendingOrderEmail', shippingEmail);
+            // Save cart to history before redirecting to Stripe
+            saveCartToHistory();
         }
         
         // Redirect to Stripe Checkout
@@ -1513,27 +1865,94 @@ async function submitOrder() {
     }
 }
 
-// Save cart to localStorage
+// Save cart to localStorage (persists across sessions)
 function saveCart() {
     localStorage.setItem('cart', JSON.stringify(cart));
+    // Note: Cart history is only saved when orders are placed, not on every cart update
+}
+
+// Save current cart to history
+function saveCartToHistory() {
+    try {
+        const cartHistory = JSON.parse(localStorage.getItem('cartHistory') || '[]');
+        
+        // Create cart snapshot
+        const cartSnapshot = {
+            date: new Date().toISOString(),
+            items: JSON.parse(JSON.stringify(cart)), // Deep copy
+        };
+        
+        // Add to history
+        cartHistory.push(cartSnapshot);
+        
+        // Keep only last 10 carts
+        if (cartHistory.length > 10) {
+            cartHistory.shift();
+        }
+        
+        localStorage.setItem('cartHistory', JSON.stringify(cartHistory));
+    } catch (error) {
+        console.error('Error saving cart to history:', error);
+    }
 }
 
 // Load cart from localStorage
 function loadCart() {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-        cart = JSON.parse(savedCart);
+    // Check if there's a reorder request from profile page
+    const reorderCart = localStorage.getItem('reorderCart');
+    const reorderQuantities = localStorage.getItem('reorderProductQuantities');
+    
+    if (reorderCart && reorderQuantities) {
+        // Load reorder cart
+        const reorderItems = JSON.parse(reorderCart);
+        const reorderQty = JSON.parse(reorderQuantities);
         
-        // Update prices with user-specific prices if available
-        cart.forEach(item => {
+        // Clear existing cart
+        cart = [];
+        productQuantities = {};
+        
+        // Populate cart with reorder items
+        reorderItems.forEach(item => {
             const product = products.find(p => p.id === item.id);
             if (product) {
-                item.price = getProductPrice(product); // Update to current user price
+                // Use current product price (may have changed)
+                const currentPrice = getProductPrice(product);
+                cart.push({
+                    id: item.id,
+                    name: item.name,
+                    price: currentPrice,
+                    quantity: item.quantity,
+                    sku: product.sku || '',
+                    description: product.description || ''
+                });
+                productQuantities[item.id] = item.quantity;
             }
-            productQuantities[item.id] = item.quantity;
         });
         
+        // Clear reorder flags
+        localStorage.removeItem('reorderCart');
+        localStorage.removeItem('reorderProductQuantities');
+        
         updateCart();
-        saveCart(); // Save updated prices
+        saveCart();
+        renderProducts(); // Re-render to show updated quantities
+    } else {
+        // Normal cart load
+        const savedCart = localStorage.getItem('cart');
+        if (savedCart) {
+            cart = JSON.parse(savedCart);
+            
+            // Update prices with user-specific prices if available
+            cart.forEach(item => {
+                const product = products.find(p => p.id === item.id);
+                if (product) {
+                    item.price = getProductPrice(product); // Update to current user price
+                }
+                productQuantities[item.id] = item.quantity;
+            });
+            
+            updateCart();
+            saveCart(); // Save updated prices
+        }
     }
 }

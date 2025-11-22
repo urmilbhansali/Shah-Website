@@ -81,6 +81,28 @@
                 `Order ID: ${orderId}<br><br>A confirmation email with your invoice has been sent to your email address.<br><br><a href="http://localhost:3000/api/invoice/${orderId}" style="color: #4CAF50; text-decoration: underline;">Download Invoice</a>`;
         }
 
+        // Save cart to history before clearing (if cart exists)
+        try {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                const cart = JSON.parse(savedCart);
+                if (cart.length > 0) {
+                    const cartHistory = JSON.parse(localStorage.getItem('cartHistory') || '[]');
+                    const cartSnapshot = {
+                        date: new Date().toISOString(),
+                        items: cart,
+                    };
+                    cartHistory.push(cartSnapshot);
+                    if (cartHistory.length > 10) {
+                        cartHistory.shift();
+                    }
+                    localStorage.setItem('cartHistory', JSON.stringify(cartHistory));
+                }
+            }
+        } catch (error) {
+            console.error('Error saving cart history:', error);
+        }
+        
         // Clear cart from localStorage
         localStorage.removeItem('cart');
     </script>
