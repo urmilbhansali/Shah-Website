@@ -3,11 +3,10 @@ FROM node:18
 WORKDIR /app
 
 # Copy package files first (for better Docker layer caching)
-COPY package.json ./
-COPY package-lock.json* ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm ci --only=production || npm install
+RUN npm install
 
 # Copy all other files
 COPY . .
