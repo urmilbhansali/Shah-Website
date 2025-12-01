@@ -235,6 +235,17 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Get Stripe publishable key endpoint
+app.get('/api/stripe-key', (req, res) => {
+    const publishableKey = process.env.STRIPE_PUBLISHABLE_KEY;
+    if (!publishableKey) {
+        return res.status(500).json({ 
+            error: 'Stripe publishable key not configured' 
+        });
+    }
+    res.json({ publishableKey: publishableKey });
+});
+
 // Get config endpoint (for Google Client ID)
 app.get('/api/config', (req, res) => {
     const clientId = process.env.GOOGLE_CLIENT_ID || '';
@@ -911,13 +922,13 @@ app.post('/create-checkout-session', async (req, res) => {
         orders[orderId] = order;
         saveOrders();
 
-        // Create Stripe Checkout Session
+        // Create Stripe Checkout Session with embedded mode
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: `${req.headers.origin}/success.html?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
-            cancel_url: `${req.headers.origin}/index.html`,
+            ui_mode: 'embedded', // Use embedded mode instead of redirect
+            return_url: `${req.headers.origin}/success.html?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
             customer_email: shippingEmail || shippingAddress?.email || undefined,
             shipping_address_collection: shippingMethod !== 'pickup' ? {
                 allowed_countries: ['US', 'CA'],
@@ -929,7 +940,7 @@ app.post('/create-checkout-session', async (req, res) => {
             },
         });
 
-        res.json({ sessionId: session.id, url: session.url, orderId: orderId });
+        res.json({ sessionId: session.id, clientSecret: session.client_secret, orderId: orderId });
     } catch (error) {
         console.error('Error creating checkout session:', error);
         res.status(500).json({ error: error.message });

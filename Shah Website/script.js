@@ -3,6 +3,10 @@ const API_BASE_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:3000' 
     : `https://${window.location.hostname}`;
 
+// Stripe instance (will be initialized after getting publishable key)
+let stripe = null;
+let checkout = null;
+
 // Product data - 55 SKUs with some having sub-SKUs
 const products = [
     {
@@ -1795,42 +1799,129 @@ function showCheckoutModal(shippingMethod, shippingEmail, shippingName, shipping
             <h3>Payment Method</h3>
             <div class="payment-options">
                 <label class="payment-option">
-                    <input type="radio" name="paymentMethod" value="card" checked>
+                    <input type="radio" name="paymentMethod" value="card" checked onchange="togglePaymentMethod()">
                     <span>Credit/Debit Card</span>
                 </label>
                 <label class="payment-option">
-                    <input type="radio" name="paymentMethod" value="cash">
+                    <input type="radio" name="paymentMethod" value="cash" onchange="togglePaymentMethod()">
                     <span>Cash on Delivery</span>
                 </label>
             </div>
             <div id="cardDetails" class="card-details">
-                <div class="form-group">
-                    <label>Card Number</label>
-                    <input type="text" id="cardNumber" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Expiry Date</label>
-                        <input type="text" id="cardExpiry" class="form-input" placeholder="MM/YY" maxlength="5">
-                    </div>
-                    <div class="form-group">
-                        <label>CVV</label>
-                        <input type="text" id="cardCVV" class="form-input" placeholder="123" maxlength="3">
-                    </div>
+                <div id="stripe-embedded-checkout">
+                    <!-- Stripe Checkout will be embedded here -->
                 </div>
             </div>
         </div>
         
         <div class="checkout-actions">
             <button class="cancel-btn" onclick="closeCheckout()">Cancel</button>
-            <button class="submit-order-btn confirm-order-btn" onclick="submitOrder()">Confirm Order</button>
+            <button class="submit-order-btn confirm-order-btn" id="confirmOrderBtn" onclick="submitOrder()" style="display: none;">Confirm Order (Cash)</button>
         </div>
     `;
     
     // Setup payment method toggle
     setupPaymentToggle();
     
+    // Initialize Stripe if not already done
+    if (!stripe) {
+        await initializeStripe();
+    }
+    
+    // Create and embed Stripe Checkout for card payments
+    await embedStripeCheckout(shippingMethod, shippingEmail, shippingName, shippingAddress, shippingCity, shippingState, shippingZip, subtotal, shippingCost);
+    
     checkoutModal.classList.add('active');
+}
+
+// Embed Stripe Checkout
+async function embedStripeCheckout(shippingMethod, shippingEmail, shippingName, shippingAddress, shippingCity, shippingState, shippingZip, subtotal, shippingCost) {
+    if (!stripe) {
+        console.error('Stripe not initialized');
+        return;
+    }
+    
+    try {
+        // Create checkout session
+        const response = await fetch(`${API_BASE_URL}/create-checkout-session`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                items: cart,
+                shippingEmail: shippingEmail,
+                shippingAddress: shippingMethod === 'pickup' ? null : {
+                    name: shippingName,
+                    address: shippingAddress,
+                    city: shippingCity,
+                    state: shippingState,
+                    zip: shippingZip,
+                },
+                shippingMethod: shippingMethod,
+                shippingCost: shippingCost,
+                isPickup: shippingMethod === 'pickup',
+            }),
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        // Store order ID
+        if (data.orderId) {
+            window.currentOrderId = data.orderId;
+        }
+        
+        // Embed Stripe Checkout
+        checkout = await stripe.initEmbeddedCheckout({
+            clientSecret: data.clientSecret,
+        });
+        
+        // Mount the Checkout form
+        const checkoutContainer = document.getElementById('stripe-embedded-checkout');
+        checkout.mount(checkoutContainer);
+        
+        // Listen for checkout completion
+        checkout.on('complete', async (event) => {
+            // Payment successful
+            const sessionId = data.sessionId;
+            await handlePaymentSuccess(sessionId, data.orderId);
+        });
+        
+    } catch (error) {
+        console.error('Error embedding Stripe Checkout:', error);
+        alert('Error loading payment form: ' + error.message);
+    }
+}
+
+// Handle payment success
+async function handlePaymentSuccess(sessionId, orderId) {
+    try {
+        // Verify the session
+        const response = await fetch(`${API_BASE_URL}/verify-session/${sessionId}`);
+        const data = await response.json();
+        
+        if (data.status === 'paid') {
+            // Close checkout modal
+            closeCheckout();
+            
+            // Show thank you modal
+            showThankYou(orderId || window.currentOrderId, data);
+            
+            // Clear cart
+            cart = [];
+            productQuantities = {};
+            updateCart();
+            saveCart();
+            renderProducts();
+        }
+    } catch (error) {
+        console.error('Error verifying payment:', error);
+        alert('Payment successful, but there was an error verifying. Please contact support.');
+    }
 }
 
 // Proceed to checkout (original checkout flow)
@@ -1901,6 +1992,16 @@ function setupPaymentToggle() {
 function closeCheckout() {
     const checkoutModal = document.getElementById('checkoutModal');
     checkoutModal.classList.remove('active');
+    
+    // Unmount Stripe Checkout if it exists
+    if (checkout) {
+        try {
+            checkout.unmount();
+            checkout = null;
+        } catch (error) {
+            console.error('Error unmounting Stripe Checkout:', error);
+        }
+    }
 }
 
 // Submit order
@@ -1983,56 +2084,66 @@ async function submitOrder() {
         return;
     }
     
-    // Handle Stripe payment for card payments
-    const submitBtn = document.querySelector('.submit-order-btn');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = 'Processing...';
-    submitBtn.disabled = true;
+    // Handle Cash on Delivery (card payments are handled by embedded Stripe Checkout)
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
     
-    try {
-        const response = await fetch(`${API_BASE_URL}/create-checkout-session`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                items: cart,
-                shippingEmail: shippingEmail,
-                shippingAddress: shippingMethod === 'pickup' ? null : {
-                    name: shippingName,
-                    address: shippingAddress,
-                    city: shippingCity,
-                    state: shippingState,
-                    zip: shippingZip,
+    if (paymentMethod === 'cash') {
+        // Handle cash on delivery
+        const submitBtn = document.querySelector('.submit-order-btn');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Processing...';
+        submitBtn.disabled = true;
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/order`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                shippingMethod: shippingMethod,
-                shippingCost: shippingCost,
-                isPickup: shippingMethod === 'pickup',
-            }),
-        });
-        
-        const data = await response.json();
-        
-        if (data.error) {
-            throw new Error(data.error);
+                body: JSON.stringify({
+                    items: cart,
+                    shippingEmail: shippingEmail,
+                    shippingAddress: shippingMethod === 'pickup' ? null : {
+                        name: shippingName,
+                        address: shippingAddress,
+                        city: shippingCity,
+                        state: shippingState,
+                        zip: shippingZip,
+                    },
+                    shippingMethod: shippingMethod,
+                    shippingCost: shippingCost,
+                    subtotal: subtotal,
+                    paymentMethod: 'cash',
+                    isPickup: shippingMethod === 'pickup',
+                }),
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Close checkout modal
+                closeCheckout();
+                
+                // Show thank you modal
+                showThankYou(data.orderId, data);
+                
+                // Clear cart
+                cart = [];
+                productQuantities = {};
+                updateCart();
+                saveCart();
+                renderProducts();
+            } else {
+                throw new Error(data.error || 'Failed to create order');
+            }
+        } catch (error) {
+            console.error('Error processing order:', error);
+            alert('Error processing order: ' + error.message);
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
         }
-        
-        // Store order info for after Stripe payment
-        if (data.orderId) {
-            localStorage.setItem('pendingOrderId', data.orderId);
-            localStorage.setItem('pendingOrderEmail', shippingEmail);
-            // Save cart to history before redirecting to Stripe
-            saveCartToHistory();
-        }
-        
-        // Redirect to Stripe Checkout
-        window.location.href = data.url;
-    } catch (error) {
-        console.error('Error processing payment:', error);
-        alert('Error processing payment: ' + error.message);
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
     }
+    // For card payments, Stripe Checkout is already embedded and will handle the payment
 }
 
 // Save cart to localStorage (persists across sessions)
