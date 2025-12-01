@@ -72,7 +72,6 @@
                         let orderDetails = `Order Total: $${data.amount_total.toFixed(2)}<br>Payment confirmed!`;
                         if (orderId) {
                             orderDetails += `<br><br>Order ID: ${orderId}`;
-                            orderDetails += `<br><br>A confirmation email with your invoice has been sent to your email address.`;
                             orderDetails += `<br><br><a href="${API_BASE_URL}/api/invoice/${orderId}" style="color: #4CAF50; text-decoration: underline;">Download Invoice</a>`;
                         }
                         document.getElementById('orderDetails').innerHTML = orderDetails;
@@ -83,7 +82,7 @@
                 });
         } else if (orderId) {
             document.getElementById('orderDetails').innerHTML = 
-                `Order ID: ${orderId}<br><br>A confirmation email with your invoice has been sent to your email address.<br><br><a href="${API_BASE_URL}/api/invoice/${orderId}" style="color: #4CAF50; text-decoration: underline;">Download Invoice</a>`;
+                `Order ID: ${orderId}<br><br><a href="${API_BASE_URL}/api/invoice/${orderId}" style="color: #4CAF50; text-decoration: underline;">Download Invoice</a>`;
         }
 
         // Save cart to history before clearing (if cart exists)

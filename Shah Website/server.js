@@ -114,8 +114,11 @@ function saveProducts() {
     }
 }
 
+// Email functionality temporarily disabled
 // Initialize Zoho Mail API configuration
 let zohoMailConfig = null;
+// Email sending is temporarily disabled - uncomment below to re-enable
+/*
 if (process.env.ZOHO_ACCESS_TOKEN && process.env.ZOHO_ACCOUNT_ID && process.env.ZOHO_EMAIL) {
     // Determine Zoho data center (default to US)
     const zohoDataCenter = process.env.ZOHO_DATA_CENTER || 'com'; // com, eu, in, com.au, jp, zohocloud.ca
@@ -131,6 +134,8 @@ if (process.env.ZOHO_ACCESS_TOKEN && process.env.ZOHO_ACCOUNT_ID && process.env.
 } else {
     console.warn('Zoho Mail API not configured. Set ZOHO_ACCESS_TOKEN, ZOHO_ACCOUNT_ID, and ZOHO_EMAIL to enable email sending.');
 }
+*/
+console.log('Email functionality is temporarily disabled.');
 
 // Load user price lists from file if it exists
 if (fs.existsSync(PRICE_LIST_FILE)) {
@@ -559,7 +564,9 @@ app.get('/verify-session/:sessionId', async (req, res) => {
         
         const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
         
+        // Email functionality temporarily disabled
         // If payment is complete and order exists, send email
+        /*
         if (session.payment_status === 'paid' && session.metadata?.order_id) {
             const orderId = session.metadata.order_id;
             const order = orders[orderId];
@@ -575,6 +582,7 @@ app.get('/verify-session/:sessionId', async (req, res) => {
                 }
             }
         }
+        */
         
         res.json({ 
             status: session.payment_status,
@@ -794,13 +802,17 @@ app.post('/api/order', async (req, res) => {
         // Generate PDF
         const pdfBuffer = await generateInvoicePDF(order);
         
+        // Email functionality temporarily disabled
         // Send email with PDF
+        /*
         try {
             await sendInvoiceEmail(order, pdfBuffer);
         } catch (emailError) {
             console.error('Email sending failed, but order was created:', emailError);
             // Continue even if email fails
         }
+        */
+        console.log('Order created successfully. Email sending is temporarily disabled.');
         
         res.json({
             success: true,
