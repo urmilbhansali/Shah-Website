@@ -14,7 +14,8 @@ RUN npm install
 COPY ["Shah Website/", "./"]
 
 # Expose port (Railway will set PORT env var)
-EXPOSE 3000
+# Railway handles port mapping automatically
+EXPOSE 8080
 
 # Start the server
 CMD ["npm", "start"]
