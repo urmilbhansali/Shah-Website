@@ -546,6 +546,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize shipping fields visibility
     toggleShippingFields();
+    
+    // Add event listener for state changes to recalculate tax
+    setTimeout(() => {
+        const stateField = document.getElementById('cartShippingState');
+        if (stateField) {
+            stateField.addEventListener('change', updateCartShipping);
+            stateField.addEventListener('input', updateCartShipping);
+        }
+    }, 100);
 });
 
 // Initialize Google Sign-In
