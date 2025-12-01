@@ -528,6 +528,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if user is already logged in
     checkUserSession();
     
+    // Auto-fill email if user is logged in
+    autoFillCartEmail();
+    
     // Initialize Google Sign-In (wait for script to load)
     if (typeof google !== 'undefined' && google.accounts) {
         initializeGoogleSignIn();
@@ -622,6 +625,9 @@ async function handleGoogleSignIn(response) {
             // Update UI
             updateUserUI();
             
+            // Auto-fill email in cart
+            autoFillCartEmail();
+            
             // Reload products with user-specific prices
             renderProducts();
             
@@ -700,6 +706,9 @@ function updateUserUI() {
                 adminLink.style.display = 'none';
             }
         }
+        
+        // Auto-fill email in cart if user is logged in
+        autoFillCartEmail();
     } else {
         userInfo.style.display = 'none';
         googleSignIn.style.display = 'block';
@@ -707,6 +716,17 @@ function updateUserUI() {
         // Hide admin link if user is not logged in
         if (adminLink) {
             adminLink.style.display = 'none';
+        }
+    }
+}
+
+// Auto-fill cart email with logged-in user's email
+function autoFillCartEmail() {
+    if (currentUser && currentUser.email) {
+        const emailField = document.getElementById('cartShippingEmail');
+        if (emailField && !emailField.value) {
+            // Only auto-fill if the field is empty (don't overwrite user input)
+            emailField.value = currentUser.email;
         }
     }
 }
@@ -797,6 +817,9 @@ function continueShopping() {
     document.getElementById('cartShippingCity').value = '';
     document.getElementById('cartShippingState').value = '';
     document.getElementById('cartShippingZip').value = '';
+    
+    // Auto-fill email if user is logged in
+    autoFillCartEmail();
 }
 
 // Get price for a product (user-specific or default)
