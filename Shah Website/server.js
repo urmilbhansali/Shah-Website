@@ -503,7 +503,7 @@ app.post('/create-checkout-session', async (req, res) => {
             });
         }
         
-        const { items, shippingAddress, shippingMethod, shippingCost } = req.body;
+        const { items, shippingAddress, shippingMethod, shippingCost, shippingEmail } = req.body;
 
         // Create line items for Stripe
         const lineItems = items.map(item => ({
@@ -539,7 +539,7 @@ app.post('/create-checkout-session', async (req, res) => {
             mode: 'payment',
             success_url: `${req.headers.origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${req.headers.origin}/index.html`,
-            customer_email: shippingAddress?.email || undefined,
+            customer_email: shippingEmail || shippingAddress?.email || undefined,
             shipping_address_collection: shippingMethod !== 'pickup' ? {
                 allowed_countries: ['US', 'CA'],
             } : undefined,
@@ -553,6 +553,15 @@ app.post('/create-checkout-session', async (req, res) => {
     } catch (error) {
         console.error('Error creating checkout session:', error);
         res.status(500).json({ error: error.message });
+    }
+});
+
+// Endpoint to provide Stripe Publishable Key to frontend
+app.get('/api/stripe-key', (req, res) => {
+    if (process.env.STRIPE_PUBLISHABLE_KEY) {
+        res.json({ publishableKey: process.env.STRIPE_PUBLISHABLE_KEY });
+    } else {
+        res.status(500).json({ error: 'Stripe Publishable Key not configured.' });
     }
 });
 
