@@ -11,6 +11,23 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Force HTTPS in production (Railway provides HTTPS automatically)
+// This middleware redirects HTTP to HTTPS
+if (process.env.NODE_ENV === 'production') {
+    app.use((req, res, next) => {
+        // Check if request is secure (HTTPS) or if Railway's proxy header is present
+        const isSecure = req.secure || 
+                        req.headers['x-forwarded-proto'] === 'https' ||
+                        req.headers['x-forwarded-ssl'] === 'on';
+        
+        // If not secure and not already HTTPS, redirect to HTTPS
+        if (!isSecure && req.get('host')) {
+            return res.redirect(301, `https://${req.get('host')}${req.url}`);
+        }
+        next();
+    });
+}
+
 // Initialize Stripe (only if key is provided)
 let stripe = null;
 if (process.env.STRIPE_SECRET_KEY) {
