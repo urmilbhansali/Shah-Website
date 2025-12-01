@@ -16,7 +16,8 @@ const products = [
         isClearance: true,
         stock: 5,
         unitsPerPack: 1,
-        color: 'Black'
+        color: 'Black',
+        photos: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=400&h=400&fit=crop']
     },
     {
         id: 2,
@@ -25,7 +26,8 @@ const products = [
         description: 'Durable protective case with built-in kickstand. Compatible with most smartphones.',
         price: 24.99,
         unitsPerPack: 1,
-        color: 'Clear'
+        color: 'Clear',
+        photos: ['https://images.unsplash.com/photo-1556656793-08538906a9f8?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&h=400&fit=crop']
     },
     {
         id: 3,
@@ -38,21 +40,24 @@ const products = [
         isClearance: true,
         stock: 12,
         unitsPerPack: 3,
-        color: 'White'
+        color: 'White',
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 4,
         sku: 'GM-004',
         name: 'LED Desk Lamp',
         description: 'Adjustable LED desk lamp with 5 brightness levels and USB charging port.',
-        price: 64.99
+        price: 64.99,
+        photos: ['https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop']
     },
     {
         id: 5,
         sku: 'GM-005',
         name: 'Air Purifier',
         description: 'HEPA air purifier that removes 99.97% of airborne particles. Quiet operation.',
-        price: 19.99
+        price: 19.99,
+        photos: ['https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop']
     },
     {
         id: 6,
@@ -64,21 +69,24 @@ const products = [
         originalPrice: 49.99,
         isClearance: true,
         stock: 8,
-        unitsPerPack: 2
+        unitsPerPack: 2,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 7,
         sku: 'GM-007',
         name: 'Laptop Stand',
         description: 'Adjustable aluminum laptop stand for improved ergonomics and cooling.',
-        price: 22.99
+        price: 22.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 8,
         sku: 'GM-008',
         name: 'Screen Cleaning Kit',
         description: 'Complete screen cleaning kit with microfiber cloths and cleaning solution.',
-        price: 8.99
+        price: 8.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 9,
@@ -89,21 +97,24 @@ const products = [
         price: 18.99,
         originalPrice: 28.99,
         isClearance: true,
-        stock: 15
+        stock: 15,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 10,
         sku: 'GM-010',
         name: 'HDMI Cable (6ft)',
         description: 'High-speed HDMI cable supporting 4K resolution. Gold-plated connectors.',
-        price: 12.99
+        price: 12.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 11,
         sku: 'GM-011',
         name: 'Webcam with Microphone',
         description: '1080p HD webcam with built-in noise-cancelling microphone. Perfect for video calls.',
-        price: 9.99
+        price: 9.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 12,
@@ -111,21 +122,24 @@ const products = [
         subSku: 'GM-012-E',
         name: 'Wireless Keyboard',
         description: 'Slim wireless keyboard with quiet keys and long battery life. Compatible with all devices.',
-        price: 11.99
+        price: 11.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 13,
         sku: 'GM-013',
         name: 'USB Hub (4-port)',
         description: 'USB 3.0 hub with 4 ports for expanding connectivity. Compact design.',
-        price: 16.99
+        price: 16.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 14,
         sku: 'GM-014',
         name: 'Cable Management Kit',
         description: 'Cable organizer kit with clips, ties, and sleeves for neat cable management.',
-        price: 7.99
+        price: 7.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 15,
@@ -136,21 +150,24 @@ const products = [
         price: 28.99,
         originalPrice: 42.99,
         isClearance: true,
-        stock: 3
+        stock: 3,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 16,
         sku: 'GM-016',
         name: 'SD Card (128GB)',
         description: 'High-speed 128GB SD card with Class 10 rating. Perfect for cameras and devices.',
-        price: 45.99
+        price: 45.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 17,
         sku: 'GM-017',
         name: 'Tablet Stand',
         description: 'Adjustable tablet stand with 360-degree rotation. Fits all tablet sizes.',
-        price: 79.99
+        price: 79.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 18,
@@ -158,21 +175,24 @@ const products = [
         subSku: 'GM-018-G',
         name: 'Phone Mount for Car',
         description: 'Magnetic car phone mount with strong grip. Easy one-handed operation.',
-        price: 14.99
+        price: 14.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 19,
         sku: 'GM-019',
         name: 'Bluetooth Speaker',
         description: 'Portable Bluetooth speaker with 12-hour battery life and waterproof design.',
-        price: 6.99
+        price: 6.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 20,
         sku: 'GM-020',
         name: 'Cable Organizer Box',
         description: 'Cable management box to hide and organize cables. Fits power strips and cables.',
-        price: 9.99
+        price: 9.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 21,
@@ -180,21 +200,24 @@ const products = [
         subSku: 'GM-021-H',
         name: 'Monitor Stand with Storage',
         description: 'Ergonomic monitor stand with built-in storage compartments. Frees up desk space.',
-        price: 19.99
+        price: 19.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 22,
         sku: 'GM-022',
         name: 'Laptop Cooling Pad',
         description: 'USB-powered laptop cooling pad with adjustable fan speeds. Prevents overheating.',
-        price: 19.99
+        price: 19.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 23,
         sku: 'GM-023',
         name: 'Phone Ring Holder',
         description: 'Adhesive phone ring holder for better grip and stand functionality.',
-        price: 12.99
+        price: 12.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 24,
@@ -205,7 +228,8 @@ const products = [
         price: 89.99,
         originalPrice: 139.99,
         isClearance: true,
-        stock: 2
+        stock: 2,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 25,
@@ -213,14 +237,16 @@ const products = [
         name: 'Screen Protector (3-pack)',
         description: 'Tempered glass screen protectors. Set of 3 with installation kit included.',
         price: 8.99,
-        unitsPerPack: 3
+        unitsPerPack: 3,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 26,
         sku: 'GM-026',
         name: 'Wireless Charging Pad',
         description: 'Fast wireless charging pad compatible with Qi-enabled devices. LED indicator.',
-        price: 54.99
+        price: 54.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 27,
@@ -228,21 +254,24 @@ const products = [
         subSku: 'GM-027-J',
         name: 'Gaming Mouse Pad',
         description: 'Large gaming mouse pad with smooth surface and stitched edges. 36x12 inches.',
-        price: 69.99
+        price: 69.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 28,
         sku: 'GM-028',
         name: 'Laptop Sleeve',
         description: 'Protective laptop sleeve with padding. Available in multiple sizes.',
-        price: 34.99
+        price: 34.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 29,
         sku: 'GM-029',
         name: 'Phone Grip Stand',
         description: 'PopSocket-style phone grip with collapsible stand. Multiple color options.',
-        price: 18.99
+        price: 18.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 30,
@@ -253,21 +282,24 @@ const products = [
         price: 42.99,
         originalPrice: 64.99,
         isClearance: true,
-        stock: 7
+        stock: 7,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 31,
         sku: 'GM-031',
         name: 'USB Flash Drive (64GB)',
         description: 'High-speed USB 3.0 flash drive with 64GB storage. Compact and portable.',
-        price: 24.99
+        price: 24.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 32,
         sku: 'GM-032',
         name: 'Phone Case with Wallet',
         description: 'Leather phone case with card slots and cash pocket. Built-in stand.',
-        price: 12.99
+        price: 12.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 33,
@@ -276,21 +308,24 @@ const products = [
         name: 'Earbuds with Case',
         description: 'Wireless earbuds with charging case. 20-hour total battery life.',
         price: 39.99,
-        unitsPerPack: 1
+        unitsPerPack: 1,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 34,
         sku: 'GM-034',
         name: 'Monitor Arm Mount',
         description: 'Adjustable monitor arm mount with gas spring. Supports up to 27 inches.',
-        price: 129.99
+        price: 129.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 35,
         sku: 'GM-035',
         name: 'Laptop Bag',
         description: 'Professional laptop bag with padded compartment and multiple pockets.',
-        price: 99.99
+        price: 99.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 36,
@@ -301,14 +336,16 @@ const products = [
         price: 119.99,
         originalPrice: 179.99,
         isClearance: true,
-        stock: 4
+        stock: 4,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 37,
         sku: 'GM-037',
         name: 'Phone Camera Lens Kit',
         description: 'Universal phone camera lens kit with wide-angle, macro, and fisheye lenses.',
-        price: 7.99
+        price: 7.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 38,
@@ -316,7 +353,8 @@ const products = [
         name: 'Cable Ties (100-pack)',
         description: 'Reusable cable ties for organizing cables. Set of 100 in assorted colors.',
         price: 6.99,
-        unitsPerPack: 100
+        unitsPerPack: 100,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 39,
@@ -324,21 +362,24 @@ const products = [
         subSku: 'GM-039-N',
         name: 'USB Extension Cable',
         description: 'USB 3.0 extension cable in 6ft length. Maintains high-speed data transfer.',
-        price: 8.99
+        price: 8.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 40,
         sku: 'GM-040',
         name: 'Phone Tripod Mount',
         description: 'Adjustable tripod mount for smartphones. Perfect for video recording.',
-        price: 12.99
+        price: 12.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 41,
         sku: 'GM-041',
         name: 'Laptop Lock Cable',
         description: 'Security cable lock for laptops. Combination lock included.',
-        price: 4.99
+        price: 4.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 42,
@@ -346,21 +387,24 @@ const products = [
         subSku: 'GM-042-O',
         name: 'Phone Car Mount (Vent)',
         description: 'Car vent phone mount with adjustable grip. One-handed operation.',
-        price: 4.99
+        price: 4.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 43,
         sku: 'GM-043',
         name: 'USB Wall Charger (Dual)',
         description: 'Fast charging dual USB wall charger with 2.4A output per port.',
-        price: 4.99
+        price: 4.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 44,
         sku: 'GM-044',
         name: 'Laptop Privacy Screen',
         description: 'Privacy screen filter for laptops. Reduces screen visibility from side angles.',
-        price: 14.99
+        price: 14.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 45,
@@ -371,21 +415,24 @@ const products = [
         price: 89.99,
         originalPrice: 129.99,
         isClearance: true,
-        stock: 6
+        stock: 6,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 46,
         sku: 'GM-046',
         name: 'Phone Battery Case',
         description: 'Battery case that doubles phone battery life. Built-in charging port.',
-        price: 64.99
+        price: 64.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 47,
         sku: 'GM-047',
         name: 'Tablet Keyboard Case',
         description: 'Protective keyboard case for tablets. Detachable keyboard with backlight.',
-        price: 49.99
+        price: 49.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 48,
@@ -393,21 +440,24 @@ const products = [
         subSku: 'GM-048-Q',
         name: 'USB-C to HDMI Adapter',
         description: 'USB-C to HDMI adapter supporting 4K resolution. Compact design.',
-        price: 16.99
+        price: 16.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 49,
         sku: 'GM-049',
         name: 'Phone Screen Magnifier',
         description: 'Portable phone screen magnifier for better viewing. Fits all phone sizes.',
-        price: 3.99
+        price: 3.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 50,
         sku: 'GM-050',
         name: 'Laptop Sticker Set',
         description: 'Decorative laptop sticker set with 50+ unique designs. Easy to remove.',
-        price: 14.99
+        price: 14.99,
+        photos: ['https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&h=400&fit=crop', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c3?w=400&h=400&fit=crop']
     },
     {
         id: 51,
