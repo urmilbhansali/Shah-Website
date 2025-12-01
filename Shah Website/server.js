@@ -619,10 +619,17 @@ function generateInvoicePDF(order) {
             doc.text(`$${order.shippingCost.toFixed(2)}`, 450, yPos);
             yPos += 20;
             
+            if (order.tax && order.tax > 0) {
+                doc.text(`Tax:`, 350, yPos);
+                doc.text(`$${order.tax.toFixed(2)}`, 450, yPos);
+                yPos += 20;
+            }
+            
             doc.fontSize(14);
             doc.font('Helvetica-Bold');
+            const total = order.subtotal + order.shippingCost + (order.tax || 0);
             doc.text(`Total:`, 350, yPos);
-            doc.text(`$${(order.subtotal + order.shippingCost).toFixed(2)}`, 450, yPos);
+            doc.text(`$${total.toFixed(2)}`, 450, yPos);
             doc.font('Helvetica');
             yPos += 30;
             
@@ -728,7 +735,7 @@ async function sendInvoiceEmail(order, pdfBuffer) {
 // Create order endpoint
 app.post('/api/order', async (req, res) => {
     try {
-        const { items, shippingEmail, shippingAddress, shippingMethod, shippingCost, subtotal, paymentMethod, isPickup } = req.body;
+        const { items, shippingEmail, shippingAddress, shippingMethod, shippingCost, subtotal, tax, paymentMethod, isPickup } = req.body;
         
         if (!shippingEmail) {
             return res.status(400).json({ success: false, error: 'Email is required' });
@@ -744,6 +751,7 @@ app.post('/api/order', async (req, res) => {
             shippingMethod,
             shippingCost,
             subtotal,
+            tax: tax || 0,
             paymentMethod,
             isPickup,
         };
@@ -808,7 +816,7 @@ app.post('/create-checkout-session', async (req, res) => {
             });
         }
         
-        const { items, shippingAddress, shippingMethod, shippingCost, shippingEmail } = req.body;
+        const { items, shippingAddress, shippingMethod, shippingCost, shippingEmail, tax } = req.body;
 
         // Create line items for Stripe
         const lineItems = items.map(item => ({
@@ -837,6 +845,21 @@ app.post('/create-checkout-session', async (req, res) => {
             });
         }
 
+        // Add tax as a line item if applicable
+        const taxAmount = tax || 0;
+        if (taxAmount > 0) {
+            lineItems.push({
+                price_data: {
+                    currency: 'usd',
+                    product_data: {
+                        name: 'Tax',
+                    },
+                    unit_amount: Math.round(taxAmount * 100),
+                },
+                quantity: 1,
+            });
+        }
+
         // Calculate subtotal
         const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
@@ -851,6 +874,7 @@ app.post('/create-checkout-session', async (req, res) => {
             shippingMethod,
             shippingCost,
             subtotal,
+            tax: taxAmount,
             paymentMethod: 'card',
             isPickup: shippingMethod === 'pickup',
         };

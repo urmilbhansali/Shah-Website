@@ -1358,20 +1358,34 @@ function updateCart() {
     updateCartShipping();
 }
 
-// Update shipping cost in cart (called from updateCart and when shipping method changes)
+// Update shipping cost and tax in cart (called from updateCart and when shipping method changes)
 function updateCartShipping() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const shippingMethod = document.getElementById('cartShippingMethod')?.value || 'standard';
+    const shippingState = document.getElementById('cartShippingState')?.value || '';
     const shipping = calculateShipping(subtotal, shippingMethod);
-    const total = subtotal + shipping;
+    
+    // Calculate tax (only if not pickup)
+    const tax = shippingMethod === 'pickup' ? 0 : calculateTax(subtotal, shippingState);
+    
+    const total = subtotal + shipping + tax;
     
     const cartTotal = document.getElementById('cartTotal');
     const liveCartTotal = document.getElementById('liveCartTotal');
     const cartShippingCost = document.getElementById('cartShippingCost');
+    const cartTax = document.getElementById('cartTax');
     
     if (cartTotal) cartTotal.textContent = total.toFixed(2);
     if (liveCartTotal) liveCartTotal.textContent = total.toFixed(2);
     if (cartShippingCost) cartShippingCost.textContent = shipping.toFixed(2);
+    
+    // Show/hide tax in live cart
+    const liveCartTax = document.getElementById('liveCartTax');
+    const liveCartTaxContainer = document.getElementById('liveCartTaxContainer');
+    if (liveCartTax) liveCartTax.textContent = tax.toFixed(2);
+    if (liveCartTaxContainer) {
+        liveCartTaxContainer.style.display = tax > 0 ? 'block' : 'none';
+    }
     
     // Update shipping method options if subtotal >= 100
     const shippingSelect = document.getElementById('cartShippingMethod');
@@ -1433,6 +1447,59 @@ function calculateShipping(subtotal, shippingMethod = 'standard') {
     return shippingRates[shippingMethod] || shippingRates['standard'];
 }
 
+// Calculate tax based on state
+// Tax is calculated on subtotal (products only, not shipping)
+function calculateTax(subtotal, state, zipCode = '') {
+    // If pickup, no tax (customer picks up at location)
+    // You can modify this logic based on your tax requirements
+    
+    // State-based tax rates (as decimal, e.g., 0.08 for 8%)
+    // Update these rates based on your actual tax requirements
+    const stateTaxRates = {
+        'NY': 0.08,  // New York - 8%
+        'CA': 0.0725, // California - 7.25%
+        'TX': 0.0625, // Texas - 6.25%
+        'FL': 0.06,   // Florida - 6%
+        'IL': 0.0625, // Illinois - 6.25%
+        'PA': 0.06,   // Pennsylvania - 6%
+        'OH': 0.0575, // Ohio - 5.75%
+        'GA': 0.04,   // Georgia - 4%
+        'NC': 0.0475, // North Carolina - 4.75%
+        'MI': 0.06,   // Michigan - 6%
+        // Add more states as needed
+    };
+    
+    // If no state provided, return 0
+    if (!state) {
+        return 0;
+    }
+    
+    // Get state code (handle full state names or abbreviations)
+    const stateCode = state.toUpperCase().trim();
+    
+    // Check if it's a full state name and convert to abbreviation
+    const stateNameMap = {
+        'NEW YORK': 'NY',
+        'CALIFORNIA': 'CA',
+        'TEXAS': 'TX',
+        'FLORIDA': 'FL',
+        'ILLINOIS': 'IL',
+        'PENNSYLVANIA': 'PA',
+        'OHIO': 'OH',
+        'GEORGIA': 'GA',
+        'NORTH CAROLINA': 'NC',
+        'MICHIGAN': 'MI',
+    };
+    
+    const normalizedState = stateNameMap[stateCode] || stateCode;
+    
+    // Get tax rate for state (default to 0 if state not found)
+    const taxRate = stateTaxRates[normalizedState] || 0;
+    
+    // Calculate tax on subtotal
+    return subtotal * taxRate;
+}
+
 // Toggle shipping address fields based on delivery method
 function toggleShippingFields() {
     const shippingMethod = document.getElementById('cartShippingMethod')?.value;
@@ -1446,7 +1513,19 @@ function toggleShippingFields() {
         if (shippingFields) shippingFields.style.display = 'block';
         if (pickupInfo) pickupInfo.style.display = 'none';
     }
+    
+    // Recalculate tax when shipping method changes
+    updateCartShipping();
 }
+
+// Add event listener for state changes to recalculate tax
+document.addEventListener('DOMContentLoaded', () => {
+    const stateField = document.getElementById('cartShippingState');
+    if (stateField) {
+        stateField.addEventListener('change', updateCartShipping);
+        stateField.addEventListener('input', updateCartShipping);
+    }
+});
 
 // Analyze cart history to find frequently bought items
 function getFrequentlyBoughtItems() {
@@ -1767,7 +1846,9 @@ function skipClearanceUpsell() {
 
 // Show checkout modal
 function showCheckoutModal(shippingMethod, shippingEmail, shippingName, shippingAddress, shippingCity, shippingState, shippingZip, subtotal, shippingCost) {
-    const total = subtotal + shippingCost;
+    // Calculate tax (only if not pickup)
+    const tax = shippingMethod === 'pickup' ? 0 : calculateTax(subtotal, shippingState);
+    const total = subtotal + shippingCost + tax;
     const checkoutBody = document.getElementById('checkoutBody');
     const checkoutModal = document.getElementById('checkoutModal');
     
@@ -1791,6 +1872,12 @@ function showCheckoutModal(shippingMethod, shippingEmail, shippingName, shipping
                     <span>Shipping:</span>
                     <span>$${shippingCost.toFixed(2)}</span>
                 </div>
+                ${tax > 0 ? `
+                <div class="order-line">
+                    <span>Tax:</span>
+                    <span>$${tax.toFixed(2)}</span>
+                </div>
+                ` : ''}
                 <div class="order-line order-total">
                     <span>Total:</span>
                     <span>$${total.toFixed(2)}</span>
@@ -1935,6 +2022,7 @@ async function submitOrder() {
     
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const shippingCost = calculateShipping(subtotal, shippingMethod);
+    const tax = shippingMethod === 'pickup' ? 0 : calculateTax(subtotal, shippingState);
     
     // Handle Cash on Delivery
     if (paymentMethod === 'cash') {
@@ -1962,6 +2050,7 @@ async function submitOrder() {
                     shippingMethod: shippingMethod,
                     shippingCost: shippingCost,
                     subtotal: subtotal,
+                    tax: tax,
                     paymentMethod: 'cash',
                     isPickup: shippingMethod === 'pickup',
                 }),
