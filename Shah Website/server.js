@@ -220,6 +220,11 @@ app.use(express.json());
 
 app.use(express.static('.'));
 
+// Health check endpoint for Railway
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Get config endpoint (for Google Client ID)
 app.get('/api/config', (req, res) => {
     const clientId = process.env.GOOGLE_CLIENT_ID || '';
@@ -1237,4 +1242,14 @@ app.delete('/api/admin/pricelist/tiers/:tier/customers', requireAdmin, (req, res
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://0.0.0.0:${PORT}`);
+    console.log(`Health check available at http://0.0.0.0:${PORT}/health`);
+});
+
+// Handle process errors
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
