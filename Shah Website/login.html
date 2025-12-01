@@ -416,75 +416,6 @@
             if (e.key === 'Enter') handleEmailSignup();
         });
         
-        // Initialize Google Sign-In
-        async function initializeGoogleSignIn() {
-            try {
-                if (typeof google === 'undefined' || !google.accounts) {
-                    console.warn('Google Sign-In script not loaded');
-                    return;
-                }
-                
-                // Fetch Google Client ID from server
-                const response = await fetch(`${API_BASE_URL}/api/config`);
-                const data = await response.json();
-                const clientId = data.googleClientId || '';
-                
-                if (!clientId || clientId === 'YOUR_GOOGLE_CLIENT_ID' || clientId === 'your_google_client_id_here') {
-                    document.getElementById('googleSignIn').innerHTML = 
-                        '<div style="color: #666; font-size: 12px; padding: 10px;">Google Sign-In not configured</div>';
-                    return;
-                }
-                
-                google.accounts.id.initialize({
-                    client_id: clientId,
-                    callback: handleGoogleSignIn,
-                    auto_select: false,
-                });
-                
-                google.accounts.id.renderButton(
-                    document.getElementById('googleSignIn'),
-                    { 
-                        theme: 'outline', 
-                        size: 'large',
-                        text: 'signin_with',
-                        width: '100%'
-                    }
-                );
-            } catch (error) {
-                console.error('Error initializing Google Sign-In:', error);
-            }
-        }
-        
-        async function handleGoogleSignIn(response) {
-            try {
-                const result = await fetch(`${API_BASE_URL}/auth/google`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ credential: response.credential }),
-                });
-                
-                const data = await result.json();
-                
-                if (data.success) {
-                    // Store user session
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    if (data.priceList) {
-                        localStorage.setItem('userPriceList', JSON.stringify(data.priceList));
-                    }
-                    
-                    // Redirect to home page
-                    window.location.href = 'index.html';
-                } else {
-                    showError('loginError', 'Google login failed. Please try again.');
-                }
-            } catch (error) {
-                console.error('Error during Google login:', error);
-                showError('loginError', 'Error connecting to server. Please try again.');
-            }
-        }
-        
         // Check if user is already logged in
         function checkUserSession() {
             const savedUser = localStorage.getItem('user');
@@ -497,13 +428,6 @@
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
             checkUserSession();
-            if (typeof google !== 'undefined' && google.accounts) {
-                initializeGoogleSignIn();
-            } else {
-                window.addEventListener('load', () => {
-                    setTimeout(initializeGoogleSignIn, 500);
-                });
-            }
         });
     </script>
 </body>
