@@ -696,8 +696,14 @@ function generateInvoicePDF(order) {
     });
 }
 
+// Email functionality temporarily disabled
 // Send email with invoice using Zoho Mail API
 async function sendInvoiceEmail(order, pdfBuffer) {
+    // Email sending is temporarily disabled
+    console.log('Email sending is temporarily disabled. Order created successfully.');
+    return;
+    
+    /* Re-enable email by uncommenting the code below and removing the early return above:
     if (!zohoMailConfig) {
         console.warn('Zoho Mail API not configured, skipping email send');
         return;
@@ -758,18 +764,12 @@ async function sendInvoiceEmail(order, pdfBuffer) {
         const result = await response.json();
         console.log(`Invoice email sent to ${order.shippingEmail} via Zoho API`);
         
-        // If we need to attach the PDF, we'll need to use a different endpoint
-        // For now, we'll send the email and note that attachment requires additional API call
-        if (pdfBuffer) {
-            console.log('Note: PDF attachment requires additional Zoho API call for attachments');
-            // TODO: Implement attachment via Zoho API if needed
-        }
-        
         return result;
     } catch (error) {
         console.error('Error sending email via Zoho API:', error);
         throw error;
     }
+    */
 }
 
 // Create order endpoint
