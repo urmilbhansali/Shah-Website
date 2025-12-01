@@ -2,13 +2,13 @@ FROM node:18
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy package files first (for better caching)
+COPY package.json package-lock.json* ./
 
 # Install dependencies
 RUN npm install
 
-# Copy all files
+# Copy all other files
 COPY . .
 
 # Expose port (Railway will set PORT env var)
