@@ -227,6 +227,9 @@ app.use(express.json());
 
 app.use(express.static('.'));
 
+// Serve product images from images/products directory
+app.use('/images/products', express.static(path.join(__dirname, 'images', 'products')));
+
 // Health check endpoint for Railway
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });

@@ -1401,3 +1401,173 @@ body {
     }
 }
 
+/* Product Photo Styles */
+.product-photo-cell {
+    width: 80px;
+    padding: 8px !important;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.product-photo-thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-photo-thumbnail:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.product-photo-placeholder {
+    width: 60px;
+    height: 60px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #999;
+}
+
+/* Photo Lightbox Modal */
+.photo-lightbox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    cursor: pointer;
+}
+
+.photo-lightbox.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.photo-lightbox-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    cursor: default;
+}
+
+.photo-lightbox-content img {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.photo-lightbox-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 36px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.photo-lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.photo-lightbox-prev,
+.photo-lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 48px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.photo-lightbox-prev:hover,
+.photo-lightbox-next:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.photo-lightbox-prev {
+    left: -70px;
+}
+
+.photo-lightbox-next {
+    right: -70px;
+}
+
+.photo-lightbox-info {
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: white;
+}
+
+.photo-lightbox-info h3 {
+    margin: 0 0 5px 0;
+    font-size: 18px;
+}
+
+.photo-lightbox-info p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 768px) {
+    .photo-lightbox-prev,
+    .photo-lightbox-next {
+        width: 40px;
+        height: 40px;
+        font-size: 36px;
+    }
+    
+    .photo-lightbox-prev {
+        left: 10px;
+    }
+    
+    .photo-lightbox-next {
+        right: 10px;
+    }
+    
+    .photo-lightbox-close {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .photo-lightbox-info {
+        bottom: -50px;
+    }
+}
+

@@ -780,7 +780,7 @@ function renderProducts(filterText = '') {
     });
 
     if (filteredProducts.length === 0) {
-        productsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: #999;">No products found matching your search.</td></tr>';
+        productsTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #999;">No products found matching your search.</td></tr>';
         return;
     }
 
@@ -827,7 +827,22 @@ function renderProducts(filterText = '') {
         const isInCart = quantity > 0;
         const totalClass = isInCart ? 'product-total in-cart' : 'product-total';
         
+        // Photo display - show first photo if available, or placeholder
+        let photoDisplay = '<div class="product-photo-placeholder">No Image</div>';
+        if (product.photos && product.photos.length > 0) {
+            const firstPhoto = product.photos[0];
+            const photoUrl = firstPhoto.startsWith('http') ? firstPhoto : `${API_BASE_URL}/images/products/${firstPhoto}`;
+            photoDisplay = `
+                <img src="${photoUrl}" 
+                     alt="${product.name}" 
+                     class="product-photo-thumbnail" 
+                     onclick="openPhotoLightbox(${product.id})"
+                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'product-photo-placeholder\\'>No Image</div>'">
+            `;
+        }
+        
         row.innerHTML = `
+            <td class="product-photo-cell">${photoDisplay}</td>
             <td class="product-sku">${product.sku}${subSkuDisplay}</td>
             <td class="product-name">${product.name} ${clearanceSticker}</td>
             <td class="product-description">${product.description}${stockDisplay}</td>
@@ -1428,10 +1443,9 @@ function showFrequentlyBoughtUpsell(items) {
                 <div class="upsell-item-controls">
                     <div class="upsell-quantity-controls">
                         <button class="qty-btn qty-minus" onclick="updateUpsellQuantity('frequentlyBought', ${product.id}, -1)">-</button>
-                        <input type="number" class="qty-input" id="upsell-qty-fb-${product.id}" value="0" min="0" onchange="updateUpsellQuantityManual('frequentlyBought', ${product.id})">
+                        <input type="number" class="qty-input" id="upsell-qty-fb-${product.id}" value="${productQuantities[product.id] || 0}" min="0" onchange="updateUpsellQuantityManual('frequentlyBought', ${product.id})">
                         <button class="qty-btn qty-plus" onclick="updateUpsellQuantity('frequentlyBought', ${product.id}, 1)">+</button>
                     </div>
-                    <button class="add-to-cart-upsell-btn" onclick="addUpsellToCart('frequentlyBought', ${product.id})">Add to Cart</button>
                 </div>
             </div>
         `;
@@ -1466,10 +1480,9 @@ function showClearanceUpsell(items) {
                 <div class="upsell-item-controls">
                     <div class="upsell-quantity-controls">
                         <button class="qty-btn qty-minus" onclick="updateUpsellQuantity('clearance', ${product.id}, -1)">-</button>
-                        <input type="number" class="qty-input" id="upsell-qty-cl-${product.id}" value="0" min="0" onchange="updateUpsellQuantityManual('clearance', ${product.id})">
+                        <input type="number" class="qty-input" id="upsell-qty-cl-${product.id}" value="${productQuantities[product.id] || 0}" min="0" onchange="updateUpsellQuantityManual('clearance', ${product.id})">
                         <button class="qty-btn qty-plus" onclick="updateUpsellQuantity('clearance', ${product.id}, 1)">+</button>
                     </div>
-                    <button class="add-to-cart-upsell-btn" onclick="addUpsellToCart('clearance', ${product.id})">Add to Cart</button>
                 </div>
             </div>
         `;
@@ -1478,7 +1491,7 @@ function showClearanceUpsell(items) {
     modal.classList.add('active');
 }
 
-// Update upsell quantity
+// Update upsell quantity - automatically updates cart
 function updateUpsellQuantity(type, productId, change) {
     const inputId = `upsell-qty-${type === 'frequentlyBought' ? 'fb' : 'cl'}-${productId}`;
     const input = document.getElementById(inputId);
@@ -1493,9 +1506,12 @@ function updateUpsellQuantity(type, productId, change) {
     }
     
     input.value = newQuantity;
+    
+    // Automatically update cart
+    updateCartFromUpsell(productId, newQuantity);
 }
 
-// Update upsell quantity manually
+// Update upsell quantity manually - automatically updates cart
 function updateUpsellQuantityManual(type, productId) {
     const inputId = `upsell-qty-${type === 'frequentlyBought' ? 'fb' : 'cl'}-${productId}`;
     const input = document.getElementById(inputId);
@@ -1506,60 +1522,49 @@ function updateUpsellQuantityManual(type, productId) {
         input.value = 0;
         newQuantity = 0;
     }
+    
+    // Automatically update cart
+    updateCartFromUpsell(productId, newQuantity);
 }
 
-// Add upsell item to cart
-function addUpsellToCart(type, productId) {
-    const inputId = `upsell-qty-${type === 'frequentlyBought' ? 'fb' : 'cl'}-${productId}`;
-    const input = document.getElementById(inputId);
-    const quantity = parseInt(input.value) || 0;
-    
-    // Don't add if quantity is 0
-    if (quantity <= 0) {
-        alert('Please select a quantity greater than 0 to add to cart.');
-        return;
-    }
-    
+// Update cart from upsell quantity change
+function updateCartFromUpsell(productId, newQuantity) {
     const product = products.find(p => p.id === productId);
     if (!product) return;
     
     const productPrice = getProductPrice(product);
     
-    // Check if item already in cart
-    const existingItem = cart.find(item => item.id === productId);
-    if (existingItem) {
-        existingItem.quantity += quantity;
+    // Find existing item in cart
+    const existingItemIndex = cart.findIndex(item => item.id === productId);
+    
+    if (newQuantity > 0) {
+        // Add or update item in cart
+        if (existingItemIndex >= 0) {
+            cart[existingItemIndex].quantity = newQuantity;
+        } else {
+            cart.push({
+                id: product.id,
+                name: product.name,
+                price: productPrice,
+                quantity: newQuantity,
+                sku: product.sku || '',
+                description: product.description || ''
+            });
+        }
     } else {
-        cart.push({
-            id: product.id,
-            name: product.name,
-            price: productPrice,
-            quantity: quantity,
-            sku: product.sku || '',
-            description: product.description || ''
-        });
+        // Remove item from cart if quantity is 0
+        if (existingItemIndex >= 0) {
+            cart.splice(existingItemIndex, 1);
+        }
     }
     
     // Update product quantities
-    productQuantities[productId] = (productQuantities[productId] || 0) + quantity;
-    
-    // Reset quantity to 0 after adding
-    input.value = 0;
+    productQuantities[productId] = newQuantity;
     
     // Update UI
     updateCart();
     saveCart();
     renderProducts();
-    
-    // Show confirmation
-    const btn = event.target;
-    const originalText = btn.textContent;
-    btn.textContent = 'Added!';
-    btn.style.background = '#4CAF50';
-    setTimeout(() => {
-        btn.textContent = originalText;
-        btn.style.background = '';
-    }, 1000);
 }
 
 // Keep main screen buttons as "Proceed to Checkout" (no changes needed)
@@ -1923,6 +1928,78 @@ function saveCartToHistory() {
         console.error('Error saving cart to history:', error);
     }
 }
+
+// Photo Lightbox functionality
+let currentPhotoIndex = 0;
+let currentProductPhotos = [];
+
+// Open photo lightbox
+function openPhotoLightbox(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product || !product.photos || product.photos.length === 0) return;
+    
+    currentProductPhotos = product.photos;
+    currentPhotoIndex = 0;
+    
+    const lightbox = document.getElementById('photoLightbox');
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxProductName = document.getElementById('lightboxProductName');
+    const lightboxPhotoCounter = document.getElementById('lightboxPhotoCounter');
+    
+    lightboxProductName.textContent = product.name;
+    updateLightboxImage();
+    lightbox.classList.add('active');
+    
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+}
+
+// Close photo lightbox
+function closePhotoLightbox() {
+    const lightbox = document.getElementById('photoLightbox');
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Change photo in lightbox
+function changePhoto(direction) {
+    if (currentProductPhotos.length <= 1) return;
+    
+    currentPhotoIndex += direction;
+    
+    if (currentPhotoIndex < 0) {
+        currentPhotoIndex = currentProductPhotos.length - 1;
+    } else if (currentPhotoIndex >= currentProductPhotos.length) {
+        currentPhotoIndex = 0;
+    }
+    
+    updateLightboxImage();
+}
+
+// Update lightbox image display
+function updateLightboxImage() {
+    const lightboxImage = document.getElementById('lightboxImage');
+    const lightboxPhotoCounter = document.getElementById('lightboxPhotoCounter');
+    
+    if (currentProductPhotos.length === 0) return;
+    
+    const photo = currentProductPhotos[currentPhotoIndex];
+    const photoUrl = photo.startsWith('http') ? photo : `${API_BASE_URL}/images/products/${photo}`;
+    
+    lightboxImage.src = photoUrl;
+    lightboxPhotoCounter.textContent = `${currentPhotoIndex + 1} / ${currentProductPhotos.length}`;
+}
+
+// Close lightbox on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closePhotoLightbox();
+    } else if (e.key === 'ArrowLeft') {
+        changePhoto(-1);
+    } else if (e.key === 'ArrowRight') {
+        changePhoto(1);
+    }
+});
 
 // Load cart from localStorage
 function loadCart() {
