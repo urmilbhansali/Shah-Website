@@ -187,22 +187,57 @@
 
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script>
+        const ADMIN_EMAIL = 'urmilbhansali@gmail.com';
         let inventory = [];
         let originalInventory = [];
+        let currentUser = null;
 
-        // Load inventory on page load
+        // Check admin access on page load
         document.addEventListener('DOMContentLoaded', () => {
-            loadInventory();
+            checkAdminAccess();
         });
+
+        function checkAdminAccess() {
+            // Get user from localStorage
+            const savedUser = localStorage.getItem('user');
+            
+            if (!savedUser) {
+                alert('Please log in to access the admin dashboard.');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            currentUser = JSON.parse(savedUser);
+            
+            // Check if user is admin
+            if (currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+                alert('Access denied. Admin privileges required.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // User is admin, load inventory
+            loadInventory();
+        }
+
+        // Helper function to get headers with admin email
+        function getAdminHeaders() {
+            if (!currentUser || !currentUser.email) {
+                throw new Error('User not authenticated');
+            }
+            return {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-User-Email': currentUser.email
+            };
+        }
 
         async function loadInventory() {
             try {
                 const startTime = Date.now();
                 const response = await fetch('http://localhost:3000/api/admin/inventory', {
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                    },
+                    headers: getAdminHeaders(),
                 });
                 
                 if (!response.ok) {
@@ -218,6 +253,11 @@
                     originalInventory = JSON.parse(JSON.stringify(inventory));
                     renderInventory();
                 } else {
+                    if (data.error && (data.error.includes('Access denied') || data.error.includes('Authentication required'))) {
+                        alert(data.error);
+                        window.location.href = 'login.html';
+                        return;
+                    }
                     showAlert('Error loading inventory: ' + (data.error || 'Unknown error'), 'error');
                 }
             } catch (error) {
@@ -366,9 +406,7 @@
             try {
                 const response = await fetch('http://localhost:3000/api/admin/inventory', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: getAdminHeaders(),
                     body: JSON.stringify({ inventory }),
                 });
 
@@ -378,6 +416,11 @@
                     showAlert('Inventory updated successfully!', 'success');
                     originalInventory = JSON.parse(JSON.stringify(inventory));
                 } else {
+                    if (data.error && (data.error.includes('Access denied') || data.error.includes('Authentication required'))) {
+                        alert(data.error);
+                        window.location.href = 'login.html';
+                        return;
+                    }
                     showAlert('Error saving inventory: ' + (data.error || 'Unknown error'), 'error');
                 }
             } catch (error) {

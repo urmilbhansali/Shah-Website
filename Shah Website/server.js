@@ -162,6 +162,33 @@ function calculateTierPrice(originalCost, tier, productId) {
     return originalCost * (1 + markup / 100);
 }
 
+// Admin email - only this email can access admin endpoints
+const ADMIN_EMAIL = 'urmilbhansali@gmail.com';
+
+// Admin authentication middleware
+function requireAdmin(req, res, next) {
+    // Get user email from request header
+    const userEmail = req.headers['x-user-email'];
+    
+    if (!userEmail) {
+        return res.status(401).json({ 
+            success: false, 
+            error: 'Authentication required. Please log in.' 
+        });
+    }
+    
+    // Check if user is admin
+    if (userEmail.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+        return res.status(403).json({ 
+            success: false, 
+            error: 'Access denied. Admin privileges required.' 
+        });
+    }
+    
+    // User is admin, proceed
+    next();
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -835,7 +862,7 @@ app.get('/api/user/orders', (req, res) => {
 });
 
 // Admin endpoint to get all orders
-app.get('/api/admin/orders', (req, res) => {
+app.get('/api/admin/orders', requireAdmin, (req, res) => {
     try {
         // Convert orders object to array
         const ordersArray = Object.values(orders);
@@ -852,7 +879,7 @@ app.get('/api/admin/orders', (req, res) => {
 });
 
 // Admin endpoint to update order status (mark as fulfilled)
-app.post('/api/admin/orders/:orderId/fulfill', (req, res) => {
+app.post('/api/admin/orders/:orderId/fulfill', requireAdmin, (req, res) => {
     try {
         const { orderId } = req.params;
         
@@ -875,7 +902,7 @@ app.post('/api/admin/orders/:orderId/fulfill', (req, res) => {
 });
 
 // Admin endpoint to get inventory
-app.get('/api/admin/inventory', (req, res) => {
+app.get('/api/admin/inventory', requireAdmin, (req, res) => {
     try {
         // Reload products from file to ensure latest data
         if (fs.existsSync(PRODUCTS_FILE)) {
@@ -899,7 +926,7 @@ app.get('/api/admin/inventory', (req, res) => {
 });
 
 // Admin endpoint to update inventory
-app.post('/api/admin/inventory', (req, res) => {
+app.post('/api/admin/inventory', requireAdmin, (req, res) => {
     try {
         const { inventory } = req.body;
         
@@ -922,7 +949,7 @@ app.post('/api/admin/inventory', (req, res) => {
 });
 
 // Admin endpoint to export orders as Excel
-app.get('/api/admin/orders/export/excel', async (req, res) => {
+app.get('/api/admin/orders/export/excel', requireAdmin, async (req, res) => {
     try {
         const XLSX = require('xlsx');
         const ordersArray = Object.values(orders);
@@ -978,7 +1005,7 @@ app.get('/api/admin/orders/export/excel', async (req, res) => {
 });
 
 // Admin endpoint to get tier configuration
-app.get('/api/admin/pricelist/tiers', (req, res) => {
+app.get('/api/admin/pricelist/tiers', requireAdmin, (req, res) => {
     try {
         // Only return customer info, not full markups (markups are large and not needed for customer list)
         const tiers = {
@@ -1007,7 +1034,7 @@ app.get('/api/admin/pricelist/tiers', (req, res) => {
 });
 
 // Admin endpoint to export tier price list to Excel
-app.get('/api/admin/pricelist/tiers/:tier/export', async (req, res) => {
+app.get('/api/admin/pricelist/tiers/:tier/export', requireAdmin, async (req, res) => {
     try {
         const { tier } = req.params;
         
@@ -1056,7 +1083,7 @@ app.get('/api/admin/pricelist/tiers/:tier/export', async (req, res) => {
 });
 
 // Admin endpoint to import tier price list from Excel
-app.post('/api/admin/pricelist/tiers/:tier/import', (req, res) => {
+app.post('/api/admin/pricelist/tiers/:tier/import', requireAdmin, (req, res) => {
     try {
         const { tier } = req.params;
         const { markups } = req.body; // Array of { productId, markup }
@@ -1091,7 +1118,7 @@ app.post('/api/admin/pricelist/tiers/:tier/import', (req, res) => {
 });
 
 // Admin endpoint to add customer to tier
-app.post('/api/admin/pricelist/tiers/:tier/customers', async (req, res) => {
+app.post('/api/admin/pricelist/tiers/:tier/customers', requireAdmin, async (req, res) => {
     try {
         const { tier } = req.params;
         const { email } = req.body;
@@ -1133,7 +1160,7 @@ app.post('/api/admin/pricelist/tiers/:tier/customers', async (req, res) => {
 });
 
 // Admin endpoint to remove customer from tier
-app.delete('/api/admin/pricelist/tiers/:tier/customers', (req, res) => {
+app.delete('/api/admin/pricelist/tiers/:tier/customers', requireAdmin, (req, res) => {
     try {
         const { tier } = req.params;
         const { email } = req.body;

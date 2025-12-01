@@ -307,16 +307,53 @@
 
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script>
+        const ADMIN_EMAIL = 'urmilbhansali@gmail.com';
         let tierData = {
             bronze: { markups: {}, customers: [] },
             silver: { markups: {}, customers: [] },
             gold: { markups: {}, customers: [] }
         };
+        let currentUser = null;
 
-        // Load tier data on page load
+        // Check admin access on page load
         document.addEventListener('DOMContentLoaded', () => {
-            loadTierData();
+            checkAdminAccess();
         });
+
+        function checkAdminAccess() {
+            // Get user from localStorage
+            const savedUser = localStorage.getItem('user');
+            
+            if (!savedUser) {
+                alert('Please log in to access the admin dashboard.');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            currentUser = JSON.parse(savedUser);
+            
+            // Check if user is admin
+            if (currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+                alert('Access denied. Admin privileges required.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // User is admin, load tier data
+            loadTierData();
+        }
+
+        // Helper function to get headers with admin email
+        function getAdminHeaders() {
+            if (!currentUser || !currentUser.email) {
+                throw new Error('User not authenticated');
+            }
+            return {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-User-Email': currentUser.email
+            };
+        }
 
         async function loadTierData() {
             const startTime = Date.now();
@@ -332,9 +369,7 @@
             try {
                 const response = await fetch('http://localhost:3000/api/admin/pricelist/tiers', {
                     method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                    },
+                    headers: getAdminHeaders(),
                     cache: 'no-cache',
                 });
                 
@@ -351,6 +386,11 @@
                     // Render immediately without waiting
                     renderTiers();
                 } else {
+                    if (data.error && (data.error.includes('Access denied') || data.error.includes('Authentication required'))) {
+                        alert(data.error);
+                        window.location.href = 'login.html';
+                        return;
+                    }
                     showAlert('Error loading tier data: ' + (data.error || 'Unknown error'), 'error');
                 }
             } catch (error) {
@@ -443,7 +483,9 @@
 
         async function exportTierPriceList(tier) {
             try {
-                const response = await fetch(`http://localhost:3000/api/admin/pricelist/tiers/${tier}/export`);
+                const response = await fetch(`http://localhost:3000/api/admin/pricelist/tiers/${tier}/export`, {
+                    headers: getAdminHeaders()
+                });
                 
                 if (response.ok) {
                     const blob = await response.blob();
@@ -458,6 +500,11 @@
                     showAlert(`${tier.charAt(0).toUpperCase() + tier.slice(1)} tier price list exported successfully!`, 'success');
                 } else {
                     const error = await response.json();
+                    if (error.error && (error.error.includes('Access denied') || error.error.includes('Authentication required'))) {
+                        alert(error.error);
+                        window.location.href = 'login.html';
+                        return;
+                    }
                     showAlert('Error exporting: ' + (error.error || 'Unknown error'), 'error');
                 }
             } catch (error) {
@@ -499,9 +546,7 @@
                     // Send to server
                     const response = await fetch(`http://localhost:3000/api/admin/pricelist/tiers/${tier}/import`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: getAdminHeaders(),
                         body: JSON.stringify({ markups }),
                     });
 
@@ -511,6 +556,11 @@
                         showAlert(`Successfully imported ${data.count} product markups for ${tier} tier!`, 'success');
                         event.target.value = '';
                     } else {
+                        if (data.error && (data.error.includes('Access denied') || data.error.includes('Authentication required'))) {
+                            alert(data.error);
+                            window.location.href = 'login.html';
+                            return;
+                        }
                         showAlert('Error importing: ' + (data.error || 'Unknown error'), 'error');
                     }
                 } catch (error) {
@@ -539,9 +589,7 @@
             try {
                 const response = await fetch(`http://localhost:3000/api/admin/pricelist/tiers/${tier}/customers`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: getAdminHeaders(),
                     body: JSON.stringify({ email }),
                 });
 
@@ -552,6 +600,11 @@
                     await loadTierData(); // Reload to get updated customer list
                     showAlert('Customer added successfully!', 'success');
                 } else {
+                    if (data.error && (data.error.includes('Access denied') || data.error.includes('Authentication required'))) {
+                        alert(data.error);
+                        window.location.href = 'login.html';
+                        return;
+                    }
                     showAlert('Error adding customer: ' + (data.error || 'Unknown error'), 'error');
                 }
             } catch (error) {
@@ -568,9 +621,7 @@
             try {
                 const response = await fetch(`http://localhost:3000/api/admin/pricelist/tiers/${tier}/customers`, {
                     method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: getAdminHeaders(),
                     body: JSON.stringify({ email }),
                 });
 
@@ -580,6 +631,11 @@
                     await loadTierData(); // Reload to get updated customer list
                     showAlert('Customer removed successfully!', 'success');
                 } else {
+                    if (data.error && (data.error.includes('Access denied') || data.error.includes('Authentication required'))) {
+                        alert(data.error);
+                        window.location.href = 'login.html';
+                        return;
+                    }
                     showAlert('Error removing customer: ' + (data.error || 'Unknown error'), 'error');
                 }
             } catch (error) {

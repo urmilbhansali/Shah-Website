@@ -624,15 +624,31 @@ function updateUserUI() {
     const userInfo = document.getElementById('userInfo');
     const googleSignIn = document.getElementById('googleSignIn');
     const userName = document.getElementById('userName');
+    const adminLink = document.getElementById('adminLink');
     
     if (currentUser) {
         userInfo.style.display = 'flex';
         googleSignIn.style.display = 'none';
         const tierName = currentUser.tier ? currentUser.tier.charAt(0).toUpperCase() + currentUser.tier.slice(1) : '';
         userName.textContent = `${currentUser.name}${tierName ? ' (' + tierName + ')' : ''}`;
+        
+        // Show admin link only if user is admin
+        if (adminLink) {
+            const ADMIN_EMAIL = 'urmilbhansali@gmail.com';
+            if (currentUser.email && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+                adminLink.style.display = 'inline-block';
+            } else {
+                adminLink.style.display = 'none';
+            }
+        }
     } else {
         userInfo.style.display = 'none';
         googleSignIn.style.display = 'block';
+        
+        // Hide admin link if user is not logged in
+        if (adminLink) {
+            adminLink.style.display = 'none';
+        }
     }
 }
 

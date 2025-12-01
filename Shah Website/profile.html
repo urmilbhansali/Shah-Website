@@ -294,7 +294,7 @@
                 <a href="index.html">Home</a>
                 <a href="about.html">About Us</a>
                 <a href="profile.html" style="color: #ff6600;">My Profile</a>
-                <a href="admin.html" style="color: #ff6600;">Admin</a>
+                <a href="admin.html" id="adminLink" style="color: #ff6600; display: none;">Admin</a>
             </nav>
             <div class="header-right">
                 <div id="userInfo" class="user-info" style="display: none;">
@@ -383,6 +383,7 @@
             const userInfo = document.getElementById('userInfo');
             const googleSignIn = document.getElementById('googleSignIn');
             const userName = document.getElementById('userName');
+            const adminLink = document.getElementById('adminLink');
             
             if (currentUser) {
                 userInfo.style.display = 'flex';
@@ -394,9 +395,24 @@
                 document.getElementById('profileUserName').textContent = currentUser.name || 'N/A';
                 document.getElementById('profileUserEmail').textContent = currentUser.email || 'N/A';
                 document.getElementById('profileUserTier').textContent = tierName || 'Guest';
+                
+                // Show admin link only if user is admin
+                if (adminLink) {
+                    const ADMIN_EMAIL = 'urmilbhansali@gmail.com';
+                    if (currentUser.email && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+                        adminLink.style.display = 'inline-block';
+                    } else {
+                        adminLink.style.display = 'none';
+                    }
+                }
             } else {
                 userInfo.style.display = 'none';
                 googleSignIn.style.display = 'block';
+                
+                // Hide admin link if user is not logged in
+                if (adminLink) {
+                    adminLink.style.display = 'none';
+                }
             }
         }
 
