@@ -545,7 +545,9 @@ app.post('/create-checkout-session', async (req, res) => {
             } : undefined,
             metadata: {
                 shipping_method: shippingMethod,
-                order_items: JSON.stringify(items),
+                item_count: items.length.toString(),
+                // Store only SKUs and quantities to stay under 500 char limit
+                items_summary: items.map(item => `${item.sku}:${item.quantity}`).join(',').substring(0, 400),
             },
         });
 
@@ -934,7 +936,9 @@ app.post('/create-checkout-session', async (req, res) => {
             metadata: {
                 order_id: orderId,
                 shipping_method: shippingMethod,
-                order_items: JSON.stringify(items),
+                item_count: items.length.toString(),
+                // Store only SKUs and quantities to stay under 500 char limit
+                items_summary: items.map(item => `${item.sku}:${item.quantity}`).join(',').substring(0, 400),
             },
         });
 
