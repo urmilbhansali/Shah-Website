@@ -1,13 +1,17 @@
 FROM node:18
 
+# Set working directory
 WORKDIR /app
 
-# Copy package files explicitly first
-COPY package.json ./
-COPY package-lock.json* ./
+# List files in build context (debug)
+RUN ls -la / || echo "Root directory listing"
 
-# Verify package.json exists (debug)
-RUN ls -la /app/ && cat package.json | head -3
+# Copy package files explicitly
+COPY package.json ./
+COPY package-lock.json ./
+
+# Verify package.json exists
+RUN ls -la && cat package.json | head -5
 
 # Install dependencies
 RUN npm install
