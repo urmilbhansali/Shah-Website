@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="accent">#FF03DAC5</color>
+    <color name="black">#FF000000</color>
+    <color name="green">#FF4CAF50</color>
+    <color name="green_light">#FFC8E6C9</color>
+    <color name="primary">#FF6200EE</color>
+    <color name="primary_dark">#FF3700B3</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="red">#FFF44336</color>
+    <color name="red_light">#FFFFCDD2</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="yellow">#FFFFC107</color>
+    <color name="yellow_light">#FFFFECB3</color>
+    <string name="add_set">Add Set</string>
+    <string name="app_name">Joint Flow</string>
+    <string name="exercise_name">Exercise</string>
+    <string name="reps">Reps</string>
+    <string name="save">Save</string>
+    <string name="set">Set</string>
+    <string name="weight">Weight</string>
+    <style name="Theme.WorkoutTracker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:colorBackground">@color/black</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
+    </style>
+</resources>

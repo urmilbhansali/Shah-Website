@@ -307,6 +307,11 @@
 
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script>
+        // API Base URL - automatically detects production or development
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? '${API_BASE_URL}' 
+            : `https://${window.location.hostname}`;
+        
         const ADMIN_EMAIL = 'urmilbhansali@gmail.com';
         let tierData = {
             bronze: { markups: {}, customers: [] },
@@ -367,7 +372,7 @@
             });
             
             try {
-                const response = await fetch('http://localhost:3000/api/admin/pricelist/tiers', {
+                const response = await fetch('${API_BASE_URL}/api/admin/pricelist/tiers', {
                     method: 'GET',
                     headers: getAdminHeaders(),
                     cache: 'no-cache',
@@ -483,7 +488,7 @@
 
         async function exportTierPriceList(tier) {
             try {
-                const response = await fetch(`http://localhost:3000/api/admin/pricelist/tiers/${tier}/export`, {
+                const response = await fetch(`${API_BASE_URL}/api/admin/pricelist/tiers/${tier}/export`, {
                     headers: getAdminHeaders()
                 });
                 
@@ -544,7 +549,7 @@
                     }
 
                     // Send to server
-                    const response = await fetch(`http://localhost:3000/api/admin/pricelist/tiers/${tier}/import`, {
+                    const response = await fetch(`${API_BASE_URL}/api/admin/pricelist/tiers/${tier}/import`, {
                         method: 'POST',
                         headers: getAdminHeaders(),
                         body: JSON.stringify({ markups }),
@@ -587,7 +592,7 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:3000/api/admin/pricelist/tiers/${tier}/customers`, {
+                const response = await fetch(`${API_BASE_URL}/api/admin/pricelist/tiers/${tier}/customers`, {
                     method: 'POST',
                     headers: getAdminHeaders(),
                     body: JSON.stringify({ email }),
@@ -619,7 +624,7 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:3000/api/admin/pricelist/tiers/${tier}/customers`, {
+                const response = await fetch(`${API_BASE_URL}/api/admin/pricelist/tiers/${tier}/customers`, {
                     method: 'DELETE',
                     headers: getAdminHeaders(),
                     body: JSON.stringify({ email }),

@@ -1,0 +1,660 @@
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/AnalyticsFragment.kt:407: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                    String.format("%.1f", value)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/AnalyticsFragment.kt:407: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                    String.format("%.1f", value)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "DefaultLocale":
+   Calling String#toLowerCase() or #toUpperCase() without specifying an
+   explicit locale is a common source of bugs. The reason for that is that
+   those methods will use the current locale on the user's device, and even
+   though the code appears to work correctly when you are developing the app,
+   it will fail in some locales. For example, in the Turkish locale, the
+   uppercase replacement for i is not I.
+
+   If you want the methods to just perform ASCII replacement, for example to
+   convert an enum name, call String#toUpperCase(Locale.ROOT) instead. If you
+   really want to use the current locale, call
+   String#toUpperCase(Locale.getDefault()) instead.
+
+   https://developer.android.com/reference/java/util/Locale.html#default_locale
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build.gradle:13: Warning: Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details. [OldTargetApi]
+        targetSdk = 34
+        ~~~~~~~~~~~~~~
+
+   Explanation for issues of type "OldTargetApi":
+   When your application or sdk runs on a version of Android that is more
+   recent than your targetSdkVersion specifies that it has been tested with,
+   various compatibility modes kick in. This ensures that your application
+   continues to work, but it may look out of place. For example, if the
+   targetSdkVersion is less than 14, your app may get an option button in the
+   UI.
+
+   To fix this issue, set the targetSdkVersion to the highest available value.
+   Then test your app to make sure everything works correctly. You may want to
+   consult the compatibility notes to see what changes apply to each version
+   you are adding support for:
+   https://developer.android.com/reference/android/os/Build.VERSION_CODES.html
+   as well as follow this guide:
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.
+   html
+
+   https://developer.android.com/distribute/best-practices/develop/target-sdk.html
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/gradle/wrapper/gradle-wrapper.properties:3: Warning: A newer version of Gradle than 8.13 is available: 8.14.3 [AndroidGradlePluginVersion]
+distributionUrl=https\://services.gradle.org/distributions/gradle-8.13-bin.zip
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "AndroidGradlePluginVersion":
+   This detector looks for usage of the Android Gradle Plugin where the
+   version you are using is not the current stable release. Using older
+   versions is fine, and there are cases where you deliberately want to stick
+   with an older version. However, you may simply not be aware that a more
+   recent version is available, and that is what this lint check helps find.
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build.gradle:8: Warning: A newer version of compileSdkVersion than 34 is available: 36 [GradleDependency]
+    compileSdk = 34
+    ~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build.gradle:45: Warning: A newer version of androidx.core:core-ktx than 1.12.0 is available: 1.17.0 [GradleDependency]
+    implementation 'androidx.core:core-ktx:1.12.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build.gradle:46: Warning: A newer version of androidx.appcompat:appcompat than 1.6.1 is available: 1.7.1 [GradleDependency]
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build.gradle:47: Warning: A newer version of com.google.android.material:material than 1.10.0 is available: 1.13.0 [GradleDependency]
+    implementation 'com.google.android.material:material:1.10.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build.gradle:48: Warning: A newer version of androidx.constraintlayout:constraintlayout than 2.1.4 is available: 2.2.1 [GradleDependency]
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build.gradle:49: Warning: A newer version of androidx.recyclerview:recyclerview than 1.3.2 is available: 1.4.0 [GradleDependency]
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build.gradle:50: Warning: A newer version of androidx.viewpager2:viewpager2 than 1.0.0 is available: 1.1.0 [GradleDependency]
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build.gradle:51: Warning: A newer version of androidx.fragment:fragment-ktx than 1.6.2 is available: 1.8.9 [GradleDependency]
+    implementation 'androidx.fragment:fragment-ktx:1.6.2'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build.gradle:55: Warning: A newer version of androidx.test.ext:junit than 1.1.5 is available: 1.3.0 [GradleDependency]
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build.gradle:56: Warning: A newer version of androidx.test.espresso:espresso-core than 3.5.1 is available: 3.7.0 [GradleDependency]
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "GradleDependency":
+   This detector looks for usages of libraries where the version you are using
+   is not the current stable release. Using older versions is fine, and there
+   are cases where you deliberately want to stick with an older version.
+   However, you may simply not be aware that a more recent version is
+   available, and that is what this lint check helps find.
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build.gradle:52: Warning: A newer version of com.google.code.gson:gson than 2.10.1 is available: 2.13.2 [NewerVersionAvailable]
+    implementation 'com.google.code.gson:gson:2.10.1'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "NewerVersionAvailable":
+   This detector checks with a central repository to see if there are newer
+   versions available for the dependencies used by this project. This is
+   similar to the GradleDependency check, which checks for newer versions
+   available in the Android SDK tools and libraries, but this works with any
+   MavenCentral dependency, and connects to the library every time, which
+   makes it more flexible but also much slower.
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/CardioFragment.kt:142: Warning: It will always be more efficient to use more specific change events if you can. Rely on notifyDataSetChanged as a last resort. [NotifyDataSetChanged]
+        cardioAdapter.notifyDataSetChanged()
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/ExerciseAdapter.kt:92: Warning: It will always be more efficient to use more specific change events if you can. Rely on notifyDataSetChanged as a last resort. [NotifyDataSetChanged]
+                setAdapter.notifyDataSetChanged()
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/ExerciseAdapter.kt:153: Warning: It will always be more efficient to use more specific change events if you can. Rely on notifyDataSetChanged as a last resort. [NotifyDataSetChanged]
+                simpleSetAdapter.notifyDataSetChanged()
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/WorkoutFragment.kt:275: Warning: It will always be more efficient to use more specific change events if you can. Rely on notifyDataSetChanged as a last resort. [NotifyDataSetChanged]
+        categoryAdapter.notifyDataSetChanged()
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/WorkoutFragment.kt:308: Warning: It will always be more efficient to use more specific change events if you can. Rely on notifyDataSetChanged as a last resort. [NotifyDataSetChanged]
+        categoryAdapter.notifyDataSetChanged()
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "NotifyDataSetChanged":
+   The RecyclerView adapter's onNotifyDataSetChanged method does not specify
+   what about the data set has changed, forcing any observers to assume that
+   all existing items and structure may no longer be valid. `LayoutManager`s
+   will be forced to fully rebind and relayout all visible views.
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/activity_main.xml:7: Warning: Possible overdraw: Root element paints background @color/black with a theme that also paints a background (inferred theme is @style/Theme.WorkoutTracker) [Overdraw]
+    android:background="@color/black"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_calendar.xml:8: Warning: Possible overdraw: Root element paints background @color/black with a theme that also paints a background (inferred theme is @style/Theme.WorkoutTracker) [Overdraw]
+    android:background="@color/black"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_cardio.xml:8: Warning: Possible overdraw: Root element paints background @color/black with a theme that also paints a background (inferred theme is @style/Theme.WorkoutTracker) [Overdraw]
+    android:background="@color/black"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_workout.xml:8: Warning: Possible overdraw: Root element paints background @color/black with a theme that also paints a background (inferred theme is @style/Theme.WorkoutTracker) [Overdraw]
+    android:background="@color/black"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_calendar_day.xml:5: Warning: Possible overdraw: Root element paints background ?attr/selectableItemBackground with a theme that also paints a background (inferred theme is @style/Theme.WorkoutTracker) [Overdraw]
+    android:background="?attr/selectableItemBackground"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "Overdraw":
+   If you set a background drawable on a root view, then you should use a
+   custom theme where the theme background is null. Otherwise, the theme
+   background will be painted first, only to have your custom background
+   completely cover it; this is called "overdraw".
+
+   NOTE: This detector relies on figuring out which layouts are associated
+   with which activities based on scanning the Java code, and it's currently
+   doing that using an inexact pattern matching algorithm. Therefore, it can
+   incorrectly conclude which activity the layout is associated with and then
+   wrongly complain that a background-theme is hidden.
+
+   If you want your custom background on multiple pages, then you should
+   consider making a custom theme with your custom background and just using
+   that theme instead of a root element background.
+
+   Of course it's possible that your custom drawable is translucent and you
+   want it to be mixed with the background. However, you will get better
+   performance if you pre-mix the background with your drawable and use that
+   resulting image or color as a custom theme background instead.
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/colors.xml:3: Warning: The resource R.color.purple_200 appears to be unused [UnusedResources]
+    <color name="purple_200">#FFBB86FC</color>
+           ~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/colors.xml:4: Warning: The resource R.color.purple_500 appears to be unused [UnusedResources]
+    <color name="purple_500">#FF6200EE</color>
+           ~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/colors.xml:5: Warning: The resource R.color.purple_700 appears to be unused [UnusedResources]
+    <color name="purple_700">#FF3700B3</color>
+           ~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/colors.xml:6: Warning: The resource R.color.teal_200 appears to be unused [UnusedResources]
+    <color name="teal_200">#FF03DAC5</color>
+           ~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/colors.xml:7: Warning: The resource R.color.teal_700 appears to be unused [UnusedResources]
+    <color name="teal_700">#FF018786</color>
+           ~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/colors.xml:11: Warning: The resource R.color.primary_dark appears to be unused [UnusedResources]
+    <color name="primary_dark">#FF3700B3</color>
+           ~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/colors.xml:13: Warning: The resource R.color.green appears to be unused [UnusedResources]
+    <color name="green">#FF4CAF50</color>
+           ~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/colors.xml:14: Warning: The resource R.color.yellow appears to be unused [UnusedResources]
+    <color name="yellow">#FFFFC107</color>
+           ~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/colors.xml:15: Warning: The resource R.color.red appears to be unused [UnusedResources]
+    <color name="red">#FFF44336</color>
+           ~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/colors.xml:16: Warning: The resource R.color.green_light appears to be unused [UnusedResources]
+    <color name="green_light">#FFC8E6C9</color>
+           ~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/colors.xml:17: Warning: The resource R.color.yellow_light appears to be unused [UnusedResources]
+    <color name="yellow_light">#FFFFECB3</color>
+           ~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/colors.xml:18: Warning: The resource R.color.red_light appears to be unused [UnusedResources]
+    <color name="red_light">#FFFFCDD2</color>
+           ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/drawable/horse_logo_png.png: Warning: The resource R.drawable.horse_logo_png appears to be unused [UnusedResources]
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/drawable/ic_horse.xml:2: Warning: The resource R.drawable.ic_horse appears to be unused [UnusedResources]
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+^
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/strings.xml:4: Warning: The resource R.string.exercise_name appears to be unused [UnusedResources]
+    <string name="exercise_name">Exercise</string>
+            ~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/values/strings.xml:9: Warning: The resource R.string.save appears to be unused [UnusedResources]
+    <string name="save">Save</string>
+            ~~~~~~~~~~~
+
+   Explanation for issues of type "UnusedResources":
+   Unused resources make applications larger and slow down builds.
+
+
+   The unused resource check can ignore tests. If you want to include
+   resources that are only referenced from tests, consider packaging them in a
+   test source set instead.
+
+   You can include test sources in the unused resource check by setting the
+   system property lint.unused-resources.include-tests =true, and to exclude
+   them (usually for performance reasons), use
+   lint.unused-resources.exclude-tests =true.
+   ,
+
+   Available options:
+
+   **skip-libraries** (default is true):
+   Whether the unused resource check should skip reporting unused resources in libraries.
+
+   Many libraries will declare resources that are part of the library surface; other modules depending on the library will also reference the resources. To avoid reporting all these resources as unused (in the context of a library), the unused resource check normally skips reporting unused resources in libraries. Instead, run the unused resource check on the consuming app module (along with `checkDependencies=true`).
+
+   However, there are cases where you want to check that all the resources declared in a library are used; in that case, you can disable the skip option.
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UnusedResources">
+           <option name="skip-libraries" value="true" />
+       </issue>
+   </lint>
+   ```
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/mipmap-hdpi/ic_launcher_round.png: Warning: Launcher icon used as round icon did not have a circular shape [IconLauncherShape]
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/mipmap-mdpi/ic_launcher_round.png: Warning: Launcher icon used as round icon did not have a circular shape [IconLauncherShape]
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png: Warning: Launcher icon used as round icon did not have a circular shape [IconLauncherShape]
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png: Warning: Launcher icon used as round icon did not have a circular shape [IconLauncherShape]
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png: Warning: Launcher icon used as round icon did not have a circular shape [IconLauncherShape]
+
+   Explanation for issues of type "IconLauncherShape":
+   According to the Android Design Guide
+   (https://d.android.com/r/studio-ui/designer/material/iconography) your
+   launcher icons should "use a distinct silhouette", a "three-dimensional,
+   front view, with a slight perspective as if viewed from above, so that
+   users perceive some depth."
+
+   The unique silhouette implies that your launcher icon should not be a
+   filled square.
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml:2: Warning: The application adaptive icon is missing a monochrome tag [MonochromeLauncherIcon]
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+^
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml:2: Warning: The application adaptive roundIcon is missing a monochrome tag [MonochromeLauncherIcon]
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+^
+
+   Explanation for issues of type "MonochromeLauncherIcon":
+   If android:roundIcon and android:icon are both in your manifest, you must
+   either remove the reference to android:roundIcon if it is not needed; or,
+   supply the monochrome icon in the drawable defined by the android:roundIcon
+   and android:icon attribute.
+
+   For example, if android:roundIcon and android:icon are both in the
+   manifest, a launcher might choose to use android:roundIcon over
+   android:icon to display the adaptive app icon. Therefore, your themed
+   application iconwill not show if your monochrome attribute is not also
+   specified in android:roundIcon.
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png: Warning: The image ic_launcher.png varies significantly in its density-independent (dip) size across the various density versions: mipmap-hdpi/ic_launcher.png: 213x213 dp (320x320 px), mipmap-mdpi/ic_launcher.png: 320x320 dp (320x320 px), mipmap-xhdpi/ic_launcher.png: 160x160 dp (320x320 px), mipmap-xxhdpi/ic_launcher.png: 107x107 dp (320x320 px), mipmap-xxxhdpi/ic_launcher.png: 80x80 dp (320x320 px) [IconDipSize]
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png: Warning: The image ic_launcher_round.png varies significantly in its density-independent (dip) size across the various density versions: mipmap-hdpi/ic_launcher_round.png: 213x213 dp (320x320 px), mipmap-mdpi/ic_launcher_round.png: 320x320 dp (320x320 px), mipmap-xhdpi/ic_launcher_round.png: 160x160 dp (320x320 px), mipmap-xxhdpi/ic_launcher_round.png: 107x107 dp (320x320 px), mipmap-xxxhdpi/ic_launcher_round.png: 80x80 dp (320x320 px) [IconDipSize]
+
+   Explanation for issues of type "IconDipSize":
+   Checks the all icons which are provided in multiple densities, all compute
+   to roughly the same density-independent pixel (dip) size. This catches
+   errors where images are either placed in the wrong folder, or icons are
+   changed to new sizes but some folders are forgotten.
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/drawable/horse_logo_png.png: Warning: Found bitmap drawable res/drawable/horse_logo_png.png in densityless folder [IconLocation]
+
+   Explanation for issues of type "IconLocation":
+   The res/drawable folder is intended for density-independent graphics such
+   as shapes defined in XML. For bitmaps, move it to drawable-mdpi and
+   consider providing higher and lower resolution versions in drawable-ldpi,
+   drawable-hdpi and drawable-xhdpi. If the icon really is density independent
+   (for example a solid color) you can place it in drawable-nodpi.
+
+   https://developer.android.com/guide/practices/screens_support.html
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png: Warning: The following unrelated icon files have identical contents: horse_logo_png.png, ic_launcher.png, ic_launcher_round.png, ic_launcher.png, ic_launcher_round.png, ic_launcher.png, ic_launcher_round.png, ic_launcher.png, ic_launcher_round.png, ic_launcher.png, ic_launcher_round.png [IconDuplicates]
+
+   Explanation for issues of type "IconDuplicates":
+   If an icon is repeated under different names, you can consolidate and just
+   use one of the icons and delete the others to make your application
+   smaller. However, duplicated icons usually are not intentional and can
+   sometimes point to icons that were accidentally overwritten or accidentally
+   not updated.
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_analytics.xml:64: Warning: Avoid using sizes smaller than 11sp: 10sp [SmallSp]
+            android:textSize="10sp"
+            ~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SmallSp":
+   Avoid using sizes smaller than 11sp.
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:41: Warning: Missing autofillHints attribute [Autofill]
+            <EditText
+             ~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:69: Warning: Missing autofillHints attribute [Autofill]
+            <EditText
+             ~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:97: Warning: Missing autofillHints attribute [Autofill]
+            <EditText
+             ~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:125: Warning: Missing autofillHints attribute [Autofill]
+            <EditText
+             ~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:153: Warning: Missing autofillHints attribute [Autofill]
+            <EditText
+             ~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:191: Warning: Missing autofillHints attribute [Autofill]
+            <EditText
+             ~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:219: Warning: Missing autofillHints attribute [Autofill]
+            <EditText
+             ~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:247: Warning: Missing autofillHints attribute [Autofill]
+            <EditText
+             ~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:275: Warning: Missing autofillHints attribute [Autofill]
+            <EditText
+             ~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:303: Warning: Missing autofillHints attribute [Autofill]
+            <EditText
+             ~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_set.xml:18: Warning: Missing autofillHints attribute [Autofill]
+    <EditText
+     ~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_set.xml:32: Warning: Missing autofillHints attribute [Autofill]
+    <EditText
+     ~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_simple_set.xml:18: Warning: Missing autofillHints attribute [Autofill]
+    <EditText
+     ~~~~~~~~
+
+   Explanation for issues of type "Autofill":
+   Specify an autofillHints attribute when targeting SDK version 26 or higher
+   or explicitly specify that the view is not important for autofill. Your app
+   can help an autofill service classify the data correctly by providing the
+   meaning of each view that could be autofillable, such as views representing
+   usernames, passwords, credit card fields, email addresses, etc.
+
+   The hints can have any value, but it is recommended to use predefined
+   values like 'username' for a username or 'creditCardNumber' for a credit
+   card number. For a list of all predefined autofill hint constants, see the
+   AUTOFILL_HINT_ constants in the View reference at
+   https://developer.android.com/reference/android/view/View.html.
+
+   You can mark a view unimportant for autofill by specifying an
+   importantForAutofill attribute on that view or a parent view. See
+   https://developer.android.com/reference/android/view/View.html#setImportant
+   ForAutofill(int).
+
+   https://developer.android.com/guide/topics/text/autofill.html
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/AnalyticsFragment.kt:87: Warning: Use the KTX extension function String.toColorInt instead? [UseKtx]
+        leftAxis.gridColor = Color.parseColor("#333333")
+                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/AnalyticsFragment.kt:87: Warning: Use the KTX extension function String.toColorInt instead? [UseKtx]
+        leftAxis.gridColor = Color.parseColor("#333333")
+                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/CardioFragment.kt:113: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        sharedPreferences.edit().putString("cardio_$dateKey", json).apply()
+        ~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/SampleDataGenerator.kt:74: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+            sharedPreferences.edit().putString("workout_$dateKey", json).apply()
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/SampleDataGenerator.kt:90: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+                    sharedPreferences.edit().putString(key, updatedJson).apply()
+                    ~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/SampleDataGenerator.kt:145: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+            sharedPreferences.edit().putString("cardio_$dateKey", cardioJson).apply()
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/WorkoutFragment.kt:271: Warning: Use the KTX extension function SharedPreferences.edit instead? [UseKtx]
+        sharedPreferences.edit().putString("workout_$dateKey", json).apply()
+        ~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UseKtx":
+   The Android KTX libraries decorates the Android platform SDK as well as
+   various libraries with more convenient extension functions available from
+   Kotlin, allowing you to use default parameters, named parameters, and
+   more.
+
+   Available options:
+
+   **remove-defaults** (default is true):
+   Whether to skip arguments that match the defaults provided by the extension.
+
+   Extensions often provide default values for some of the parameters. For example:
+   ```kotlin
+   fun Path.readLines(charset: Charset = Charsets.UTF_8): List<String> { return Files.readAllLines(this, charset) }
+   ```
+   This lint check will by default automatically omit parameters that match the default, so if your code was calling
+
+   ```kotlin
+   Files.readAllLines(file, Charset.UTF_8)
+   ```
+   lint would replace this with
+   ```kotlin
+   file.readLines()
+   ```
+   rather than
+
+   ```kotlin
+   file.readLines(Charset.UTF_8
+   ```
+   You can turn this behavior off using this option.
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UseKtx">
+           <option name="remove-defaults" value="true" />
+       </issue>
+   </lint>
+   ```
+
+   **require-present** (default is true):
+   Whether to only offer extensions already available.
+
+   This option lets you only have lint suggest extension replacements if those extensions are already available on the class path (in other words, you're already depending on the library containing the extension method.)
+
+   To configure this option, use a `lint.xml` file with an <option> like this:
+
+   ```xml
+   <lint>
+       <issue id="UseKtx">
+           <option name="require-present" value="true" />
+       </issue>
+   </lint>
+   ```
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/SampleDataGenerator.kt:12: Warning: Assigning Locale.getDefault() to a final static field is suspicious; this code will not work correctly if the user changes locale while the app is running [ConstantLocale]
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                                                            ~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "ConstantLocale":
+   Assigning Locale.getDefault() to a constant is suspicious, because the
+   locale can change while the app is running.
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/AnalyticsFragment.kt:371: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        xAxisLabel.text = "Date"
+                           ~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/SetAdapter.kt:34: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        holder.setNumberTextView.text = "Set ${position + 1}"
+                                        ~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/SetAdapter.kt:34: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        holder.setNumberTextView.text = "Set ${position + 1}"
+                                               ~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/SetAdapter.kt:34: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        holder.setNumberTextView.text = "Set ${position + 1}"
+                                         ~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/SimpleSetAdapter.kt:32: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        holder.setNumberTextView.text = "Set ${position + 1}"
+                                        ~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/SimpleSetAdapter.kt:32: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        holder.setNumberTextView.text = "Set ${position + 1}"
+                                               ~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/java/com/workouttracker/SimpleSetAdapter.kt:32: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        holder.setNumberTextView.text = "Set ${position + 1}"
+                                         ~~~~
+
+   Explanation for issues of type "SetTextI18n":
+   When calling TextView#setText
+   * Never call Number#toString() to format numbers; it will not handle
+   fraction separators and locale-specific digits properly. Consider using
+   String#format with proper format specifications (%d or %f) instead.
+   * Do not pass a string literal (e.g. "Hello") to display text. Hardcoded
+   text can not be properly translated to other languages. Consider using
+   Android resource strings instead.
+   * Do not build messages by concatenating text chunks. Such messages can not
+   be properly translated.
+
+   https://developer.android.com/guide/topics/resources/localization.html
+
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_analytics.xml:19: Warning: Hardcoded string "Analytics", should use @string resource [HardcodedText]
+            android:text="Analytics"
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_analytics.xml:63: Warning: Hardcoded string "Value", should use @string resource [HardcodedText]
+            android:text="Value"
+            ~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_analytics.xml:91: Warning: Hardcoded string "Date", should use @string resource [HardcodedText]
+            android:text="Date"
+            ~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_calendar.xml:15: Warning: Hardcoded string "Workout Calendar", should use @string resource [HardcodedText]
+        android:text="Workout Calendar"
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_calendar.xml:38: Warning: Hardcoded string "◀", should use @string resource [HardcodedText]
+            android:text="◀"
+            ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_calendar.xml:49: Warning: Hardcoded string "January 2024", should use @string resource [HardcodedText]
+            android:text="January 2024"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_calendar.xml:59: Warning: Hardcoded string "▶", should use @string resource [HardcodedText]
+            android:text="▶"
+            ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_calendar.xml:80: Warning: Hardcoded string "Sun", should use @string resource [HardcodedText]
+            android:text="Sun"
+            ~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_calendar.xml:90: Warning: Hardcoded string "Mon", should use @string resource [HardcodedText]
+            android:text="Mon"
+            ~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_calendar.xml:100: Warning: Hardcoded string "Tue", should use @string resource [HardcodedText]
+            android:text="Tue"
+            ~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_calendar.xml:110: Warning: Hardcoded string "Wed", should use @string resource [HardcodedText]
+            android:text="Wed"
+            ~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_calendar.xml:120: Warning: Hardcoded string "Thu", should use @string resource [HardcodedText]
+            android:text="Thu"
+            ~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_calendar.xml:130: Warning: Hardcoded string "Fri", should use @string resource [HardcodedText]
+            android:text="Fri"
+            ~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_calendar.xml:140: Warning: Hardcoded string "Sat", should use @string resource [HardcodedText]
+            android:text="Sat"
+            ~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_cardio.xml:15: Warning: Hardcoded string "Cardio", should use @string resource [HardcodedText]
+        android:text="Cardio"
+        ~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_cardio.xml:37: Warning: Hardcoded string "Date: ", should use @string resource [HardcodedText]
+            android:text="Date: "
+            ~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_cardio.xml:46: Warning: Hardcoded string "Today", should use @string resource [HardcodedText]
+            android:text="Today"
+            ~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_workout.xml:37: Warning: Hardcoded string "Date: ", should use @string resource [HardcodedText]
+            android:text="Date: "
+            ~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/fragment_workout.xml:46: Warning: Hardcoded string "Today", should use @string resource [HardcodedText]
+            android:text="Today"
+            ~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:21: Warning: Hardcoded string "Exercise Name", should use @string resource [HardcodedText]
+            android:text="Exercise Name"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:37: Warning: Hardcoded string "Duration (min):", should use @string resource [HardcodedText]
+                android:text="Duration (min):"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:47: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                android:hint="0"
+                ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:65: Warning: Hardcoded string "Avg BPM:", should use @string resource [HardcodedText]
+                android:text="Avg BPM:"
+                ~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:75: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                android:hint="0"
+                ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:93: Warning: Hardcoded string "Calories:", should use @string resource [HardcodedText]
+                android:text="Calories:"
+                ~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:103: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                android:hint="0"
+                ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:121: Warning: Hardcoded string "Min HR:", should use @string resource [HardcodedText]
+                android:text="Min HR:"
+                ~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:131: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                android:hint="0"
+                ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:149: Warning: Hardcoded string "Max HR:", should use @string resource [HardcodedText]
+                android:text="Max HR:"
+                ~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:159: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                android:hint="0"
+                ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:170: Warning: Hardcoded string "Time in Zones (minutes):", should use @string resource [HardcodedText]
+            android:text="Time in Zones (minutes):"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:187: Warning: Hardcoded string "Zone 1:", should use @string resource [HardcodedText]
+                android:text="Zone 1:"
+                ~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:197: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                android:hint="0"
+                ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:215: Warning: Hardcoded string "Zone 2:", should use @string resource [HardcodedText]
+                android:text="Zone 2:"
+                ~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:225: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                android:hint="0"
+                ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:243: Warning: Hardcoded string "Zone 3:", should use @string resource [HardcodedText]
+                android:text="Zone 3:"
+                ~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:253: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                android:hint="0"
+                ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:271: Warning: Hardcoded string "Zone 4:", should use @string resource [HardcodedText]
+                android:text="Zone 4:"
+                ~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:281: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                android:hint="0"
+                ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:299: Warning: Hardcoded string "Zone 5:", should use @string resource [HardcodedText]
+                android:text="Zone 5:"
+                ~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_cardio.xml:309: Warning: Hardcoded string "0", should use @string resource [HardcodedText]
+                android:hint="0"
+                ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_category.xml:33: Warning: Hardcoded string "Category Name", should use @string resource [HardcodedText]
+                android:text="Category Name"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_category.xml:42: Warning: Hardcoded string "▼", should use @string resource [HardcodedText]
+                android:text="▼"
+                ~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_exercise.xml:21: Warning: Hardcoded string "Exercise Name", should use @string resource [HardcodedText]
+            android:text="Exercise Name"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_set.xml:14: Warning: Hardcoded string "Set 1", should use @string resource [HardcodedText]
+        android:text="Set 1"
+        ~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_set.xml:24: Warning: Hardcoded string "Weight", should use @string resource [HardcodedText]
+        android:hint="Weight"
+        ~~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_set.xml:38: Warning: Hardcoded string "Reps", should use @string resource [HardcodedText]
+        android:hint="Reps"
+        ~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_simple_set.xml:14: Warning: Hardcoded string "Set 1", should use @string resource [HardcodedText]
+        android:text="Set 1"
+        ~~~~~~~~~~~~~~~~~~~~
+/Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res/layout/item_simple_set.xml:24: Warning: Hardcoded string "Reps", should use @string resource [HardcodedText]
+        android:hint="Reps"
+        ~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "HardcodedText":
+   Hardcoding text attributes directly in layout files is bad for several
+   reasons:
+
+   * When creating configuration variations (for example for landscape or
+   portrait) you have to repeat the actual text (and keep it up to date when
+   making changes)
+
+   * The application cannot be translated to other languages by just adding
+   new translations for existing string resources.
+
+   There are quickfixes to automatically extract this hardcoded string into a
+   resource lookup.
+
+0 errors, 130 warnings

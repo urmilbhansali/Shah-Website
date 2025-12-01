@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Joint Flow</string>
+    <string name="exercise_name">Exercise</string>
+    <string name="reps">Reps</string>
+    <string name="weight">Weight</string>
+    <string name="set">Set</string>
+    <string name="add_set">Add Set</string>
+    <string name="save">Save</string>
+</resources>
+

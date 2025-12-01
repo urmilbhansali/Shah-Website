@@ -361,6 +361,11 @@
     </footer>
 
     <script>
+        // API Base URL - automatically detects production or development
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? '${API_BASE_URL}' 
+            : `https://${window.location.hostname}`;
+        
         let currentUser = null;
 
         // Check if user is logged in
@@ -424,7 +429,7 @@
             }
 
             try {
-                const response = await fetch(`http://localhost:3000/api/user/orders?email=${encodeURIComponent(currentUser.email)}`);
+                const response = await fetch(`${API_BASE_URL}/api/user/orders?email=${encodeURIComponent(currentUser.email)}`);
                 const data = await response.json();
                 
                 if (data.success && data.orders && data.orders.length > 0) {
@@ -511,7 +516,7 @@
         }
 
         function downloadInvoice(orderId) {
-            window.open(`http://localhost:3000/api/order/${orderId}/invoice`, '_blank');
+            window.open(`${API_BASE_URL}/api/order/${orderId}/invoice`, '_blank');
         }
 
         function loadCartHistory() {

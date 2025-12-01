@@ -1,0 +1,18 @@
+<lint-module
+    format="1"
+    dir="/Users/urmilbhansali/Coding Projects/WorkoutTracker/app"
+    name=":app"
+    type="APP"
+    maven="WorkoutTracker:app:unspecified"
+    agpVersion="8.13.1"
+    buildFolder="build"
+    bootClassPath="/Users/urmilbhansali/Library/Android/sdk/platforms/android-34/android.jar:/Users/urmilbhansali/Library/Android/sdk/build-tools/35.0.0/core-lambda-stubs.jar"
+    javaSourceLevel="17"
+    compileTarget="android-34">
+  <lintOptions
+      abortOnError="true"
+      absolutePaths="true"
+      checkReleaseBuilds="true"
+      explainIssues="true"/>
+  <variant name="release"/>
+</lint-module>

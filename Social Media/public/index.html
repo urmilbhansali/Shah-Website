@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social - Invite Only</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Login/Signup View -->
+        <div id="auth-view" class="auth-container">
+            <div class="auth-card">
+                <h1 class="logo">Social</h1>
+                <p class="tagline">Invite-only social network</p>
+                
+                <div id="auth-tabs" class="auth-tabs">
+                    <button class="tab-btn active" data-tab="login">Login</button>
+                    <button class="tab-btn" data-tab="signup">Sign Up</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" class="auth-form">
+                    <div class="form-group">
+                        <input type="email" id="login-email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="login-password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Log In</button>
+                    <div id="login-error" class="error-message"></div>
+                </form>
+
+                <!-- Signup Form -->
+                <form id="signup-form" class="auth-form hidden">
+                    <div class="form-group">
+                        <input type="text" id="signup-username" placeholder="Username" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="signup-email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="signup-password" placeholder="Password" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="signup-invite" placeholder="Invite Code" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                    <div id="signup-error" class="error-message"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main App View -->
+        <div id="main-view" class="main-container hidden">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2 class="logo">Social</h2>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item active" data-page="feed">
+                        <span class="nav-icon">🏠</span>
+                        <span>Home</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="explore">
+                        <span class="nav-icon">🔍</span>
+                        <span>Explore</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="profile">
+                        <span class="nav-icon">👤</span>
+                        <span>Profile</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="invites">
+                        <span class="nav-icon">✉️</span>
+                        <span>Invites</span>
+                    </a>
+                </nav>
+                <div class="sidebar-footer">
+                    <button id="logout-btn" class="btn btn-secondary">Log Out</button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Feed Page -->
+                <div id="feed-page" class="page active">
+                    <div class="page-header">
+                        <h2>Home</h2>
+                    </div>
+                    <div class="compose-box">
+                        <div class="compose-header">
+                            <img id="compose-avatar" src="" alt="Avatar" class="avatar small">
+                            <textarea id="post-content" placeholder="What's happening?" maxlength="280"></textarea>
+                        </div>
+                        <div class="compose-footer">
+                            <span id="char-count" class="char-count">0/280</span>
+                            <button id="post-btn" class="btn btn-primary">Post</button>
+                        </div>
+                    </div>
+                    <div id="posts-container" class="posts-container"></div>
+                </div>
+
+                <!-- Explore Page -->
+                <div id="explore-page" class="page">
+                    <div class="page-header">
+                        <h2>Explore</h2>
+                    </div>
+                    <div id="explore-posts" class="posts-container"></div>
+                </div>
+
+                <!-- Profile Page -->
+                <div id="profile-page" class="page">
+                    <div class="page-header">
+                        <h2>Profile</h2>
+                    </div>
+                    <div id="profile-content" class="profile-content">
+                        <div class="profile-header">
+                            <img id="profile-avatar" src="" alt="Avatar" class="avatar large">
+                            <h3 id="profile-name"></h3>
+                            <p id="profile-username" class="username"></p>
+                            <p id="profile-bio" class="bio"></p>
+                            <div class="profile-stats">
+                                <span><strong id="posts-count">0</strong> Posts</span>
+                                <span><strong id="followers-count">0</strong> Followers</span>
+                                <span><strong id="following-count">0</strong> Following</span>
+                            </div>
+                            <button id="edit-profile-btn" class="btn btn-secondary">Edit Profile</button>
+                        </div>
+                        <div id="profile-posts" class="posts-container"></div>
+                    </div>
+                </div>
+
+                <!-- Invites Page -->
+                <div id="invites-page" class="page">
+                    <div class="page-header">
+                        <h2>Invites</h2>
+                    </div>
+                    <div class="invites-content">
+                        <div class="invite-section">
+                            <h3>Create New Invite</h3>
+                            <button id="create-invite-btn" class="btn btn-primary">Generate Invite Code</button>
+                            <div id="new-invite-display" class="invite-display hidden">
+                                <p>Your invite code:</p>
+                                <div class="invite-code" id="new-invite-code"></div>
+                                <button id="copy-invite-btn" class="btn btn-secondary">Copy</button>
+                            </div>
+                        </div>
+                        <div class="invite-section">
+                            <h3>Your Invites</h3>
+                            <div id="invites-list" class="invites-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,142 @@
+[
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/layout_item_exercise.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/layout/item_exercise.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/layout_item_set.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/layout/item_set.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/layout_fragment_analytics.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/layout/fragment_analytics.xml"
+    },
+    {
+        "merged": "com.workouttracker.app-debug-38:/layout_fragment_analytics.xml.flat",
+        "source": "com.workouttracker.app-main-40:/layout/fragment_analytics.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/layout_item_simple_set.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/layout/item_simple_set.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/drawable_ic_launcher_background.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.workouttracker.app-debug-38:/layout_item_simple_set.xml.flat",
+        "source": "com.workouttracker.app-main-40:/layout/item_simple_set.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/layout_item_category.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/layout/item_category.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/drawable_ic_launcher_foreground.png.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/drawable/ic_launcher_foreground.png"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/layout_activity_main.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.workouttracker.app-debug-38:/layout_item_cardio.xml.flat",
+        "source": "com.workouttracker.app-main-40:/layout/item_cardio.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/mipmap-xxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/mipmap-mdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "com.workouttracker.app-debug-38:/layout_fragment_calendar.xml.flat",
+        "source": "com.workouttracker.app-main-40:/layout/fragment_calendar.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/mipmap-xhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/mipmap-xxxhdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/mipmap-hdpi/ic_launcher_round.png"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/drawable_ic_horse.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/drawable/ic_horse.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/layout_fragment_workout.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/layout/fragment_workout.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/layout_fragment_calendar.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/layout/fragment_calendar.xml"
+    },
+    {
+        "merged": "com.workouttracker.app-debug-38:/layout_activity_main.xml.flat",
+        "source": "com.workouttracker.app-main-40:/layout/activity_main.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/drawable_workout_indicator.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/drawable/workout_indicator.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/layout_item_calendar_day.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/layout/item_calendar_day.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/layout_fragment_cardio.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/layout/fragment_cardio.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.workouttracker.app-debug-38:/layout_item_set.xml.flat",
+        "source": "com.workouttracker.app-main-40:/layout/item_set.xml"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/drawable_horse_logo_png.png.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/drawable/horse_logo_png.png"
+    },
+    {
+        "merged": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-debug-38:/layout_item_cardio.xml.flat",
+        "source": "/Users/urmilbhansali/.gradle/daemon/8.13/com.workouttracker.app-main-40:/layout/item_cardio.xml"
+    }
+]

@@ -1,0 +1,43 @@
+com.workouttracker.app-drawerlayout-1.1.1-0 /Users/urmilbhansali/.gradle/caches/8.13/transforms/071b3f1d6535d7849afa98d483344fed/transformed/drawerlayout-1.1.1/res
+com.workouttracker.app-core-1.12.0-1 /Users/urmilbhansali/.gradle/caches/8.13/transforms/10078325057f414079ed11f442fa2d5b/transformed/core-1.12.0/res
+com.workouttracker.app-jetified-fragment-ktx-1.6.2-2 /Users/urmilbhansali/.gradle/caches/8.13/transforms/10dc27331c9d6be28c7e1443e7ec100b/transformed/jetified-fragment-ktx-1.6.2/res
+com.workouttracker.app-appcompat-1.6.1-3 /Users/urmilbhansali/.gradle/caches/8.13/transforms/147db945ee6ab59d5a5f5a94882aa2d0/transformed/appcompat-1.6.1/res
+com.workouttracker.app-jetified-lifecycle-viewmodel-savedstate-2.6.1-4 /Users/urmilbhansali/.gradle/caches/8.13/transforms/17c7f0ea6f696e3c228b090723a99e33/transformed/jetified-lifecycle-viewmodel-savedstate-2.6.1/res
+com.workouttracker.app-jetified-lifecycle-process-2.6.1-5 /Users/urmilbhansali/.gradle/caches/8.13/transforms/2eb1e32c8de9277a743a8a18be92ff9d/transformed/jetified-lifecycle-process-2.6.1/res
+com.workouttracker.app-recyclerview-1.3.2-6 /Users/urmilbhansali/.gradle/caches/8.13/transforms/3ce39e7095c4226f274165f55d716141/transformed/recyclerview-1.3.2/res
+com.workouttracker.app-jetified-savedstate-1.2.1-7 /Users/urmilbhansali/.gradle/caches/8.13/transforms/5021004848aa3fa28e7f32de510e5e2f/transformed/jetified-savedstate-1.2.1/res
+com.workouttracker.app-jetified-core-ktx-1.12.0-8 /Users/urmilbhansali/.gradle/caches/8.13/transforms/5d98bdfa3d2f988f80adb5550ab72726/transformed/jetified-core-ktx-1.12.0/res
+com.workouttracker.app-jetified-lifecycle-runtime-ktx-2.6.1-9 /Users/urmilbhansali/.gradle/caches/8.13/transforms/6219f7a85415d5cfa00a88d9f0438902/transformed/jetified-lifecycle-runtime-ktx-2.6.1/res
+com.workouttracker.app-core-runtime-2.2.0-10 /Users/urmilbhansali/.gradle/caches/8.13/transforms/62aeeeae5f31d7cd03b5cb341d82f2d8/transformed/core-runtime-2.2.0/res
+com.workouttracker.app-transition-1.2.0-11 /Users/urmilbhansali/.gradle/caches/8.13/transforms/6abb614a33ad14d0574a590587f7c403/transformed/transition-1.2.0/res
+com.workouttracker.app-material-1.10.0-12 /Users/urmilbhansali/.gradle/caches/8.13/transforms/6acd2798a46c8e8dcbd9ab0ea4969c26/transformed/material-1.10.0/res
+com.workouttracker.app-lifecycle-viewmodel-2.6.1-13 /Users/urmilbhansali/.gradle/caches/8.13/transforms/6d5c7700d91e5c1382ac55340430420f/transformed/lifecycle-viewmodel-2.6.1/res
+com.workouttracker.app-jetified-lifecycle-viewmodel-ktx-2.6.1-14 /Users/urmilbhansali/.gradle/caches/8.13/transforms/6e1b50d9f5a293cc370480a746df8a9b/transformed/jetified-lifecycle-viewmodel-ktx-2.6.1/res
+com.workouttracker.app-cardview-1.0.0-15 /Users/urmilbhansali/.gradle/caches/8.13/transforms/6eb0f22a818c9d3c7c887327cb74a211/transformed/cardview-1.0.0/res
+com.workouttracker.app-jetified-emoji2-1.2.0-16 /Users/urmilbhansali/.gradle/caches/8.13/transforms/70f894b680853dada58ad4ecc720f9ac/transformed/jetified-emoji2-1.2.0/res
+com.workouttracker.app-constraintlayout-2.1.4-17 /Users/urmilbhansali/.gradle/caches/8.13/transforms/71174db399457f4e3776eef56ceef98d/transformed/constraintlayout-2.1.4/res
+com.workouttracker.app-jetified-savedstate-ktx-1.2.1-18 /Users/urmilbhansali/.gradle/caches/8.13/transforms/7362e233cbe128684c9770daa4b75ea1/transformed/jetified-savedstate-ktx-1.2.1/res
+com.workouttracker.app-jetified-profileinstaller-1.3.0-19 /Users/urmilbhansali/.gradle/caches/8.13/transforms/76768802bf4d5ffa0a78a90312b06e82/transformed/jetified-profileinstaller-1.3.0/res
+com.workouttracker.app-jetified-customview-poolingcontainer-1.0.0-20 /Users/urmilbhansali/.gradle/caches/8.13/transforms/7a86c61201f3a84f3c7a80a64cd620ce/transformed/jetified-customview-poolingcontainer-1.0.0/res
+com.workouttracker.app-lifecycle-livedata-core-2.6.1-21 /Users/urmilbhansali/.gradle/caches/8.13/transforms/8dbcaa191b3258015483d377ad312929/transformed/lifecycle-livedata-core-2.6.1/res
+com.workouttracker.app-lifecycle-livedata-2.6.1-22 /Users/urmilbhansali/.gradle/caches/8.13/transforms/99d4340cd248a0e9f499186dd5197e9e/transformed/lifecycle-livedata-2.6.1/res
+com.workouttracker.app-jetified-activity-1.8.0-23 /Users/urmilbhansali/.gradle/caches/8.13/transforms/99ff44a22b7713e8511c4c19105f09de/transformed/jetified-activity-1.8.0/res
+com.workouttracker.app-lifecycle-runtime-2.6.1-24 /Users/urmilbhansali/.gradle/caches/8.13/transforms/a59c0f85bf8e9c164ed5ec713076bf48/transformed/lifecycle-runtime-2.6.1/res
+com.workouttracker.app-jetified-annotation-experimental-1.3.0-25 /Users/urmilbhansali/.gradle/caches/8.13/transforms/b16a91e3343e45016aecd2c4ac36fb7a/transformed/jetified-annotation-experimental-1.3.0/res
+com.workouttracker.app-jetified-viewpager2-1.1.0-beta02-26 /Users/urmilbhansali/.gradle/caches/8.13/transforms/c4e6537b58c9fd59c38054ca80465557/transformed/jetified-viewpager2-1.1.0-beta02/res
+com.workouttracker.app-jetified-lifecycle-livedata-core-ktx-2.6.1-27 /Users/urmilbhansali/.gradle/caches/8.13/transforms/c553a437533e9090c57d360695041687/transformed/jetified-lifecycle-livedata-core-ktx-2.6.1/res
+com.workouttracker.app-fragment-1.6.2-28 /Users/urmilbhansali/.gradle/caches/8.13/transforms/d13bc10385e92e4b07d86d4262bf2c48/transformed/fragment-1.6.2/res
+com.workouttracker.app-jetified-emoji2-views-helper-1.2.0-29 /Users/urmilbhansali/.gradle/caches/8.13/transforms/d206d8fea8eb194f150dd73c01afe420/transformed/jetified-emoji2-views-helper-1.2.0/res
+com.workouttracker.app-jetified-appcompat-resources-1.6.1-30 /Users/urmilbhansali/.gradle/caches/8.13/transforms/e523bbd9988320b16d9e72b513d2aa99/transformed/jetified-appcompat-resources-1.6.1/res
+com.workouttracker.app-jetified-activity-ktx-1.8.0-31 /Users/urmilbhansali/.gradle/caches/8.13/transforms/ea16f6fe9125acca15df7c0984b7f181/transformed/jetified-activity-ktx-1.8.0/res
+com.workouttracker.app-coordinatorlayout-1.1.0-32 /Users/urmilbhansali/.gradle/caches/8.13/transforms/f45b28197b2e1a965cc3c7ab40f99eba/transformed/coordinatorlayout-1.1.0/res
+com.workouttracker.app-jetified-startup-runtime-1.1.1-33 /Users/urmilbhansali/.gradle/caches/8.13/transforms/f4e750a77adb416ad1c054d94e1b474c/transformed/jetified-startup-runtime-1.1.1/res
+com.workouttracker.app-pngs-34 /Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build/generated/res/pngs/release
+com.workouttracker.app-resValues-35 /Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build/generated/res/resValues/release
+com.workouttracker.app-updated_navigation_xml-36 /Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build/generated/updated_navigation_xml/release
+com.workouttracker.app-packageReleaseResources-37 /Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build/intermediates/incremental/release/packageReleaseResources/merged.dir
+com.workouttracker.app-packageReleaseResources-38 /Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build/intermediates/incremental/release/packageReleaseResources/stripped.dir
+com.workouttracker.app-merged-not-compiled-resources-39 /Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build/intermediates/merged-not-compiled-resources/release
+com.workouttracker.app-release-40 /Users/urmilbhansali/Coding Projects/WorkoutTracker/app/build/intermediates/merged_res/release/mergeReleaseResources
+com.workouttracker.app-main-41 /Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/main/res
+com.workouttracker.app-release-42 /Users/urmilbhansali/Coding Projects/WorkoutTracker/app/src/release/res

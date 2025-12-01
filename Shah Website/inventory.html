@@ -187,6 +187,11 @@
 
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script>
+        // API Base URL - automatically detects production or development
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000' 
+            : `https://${window.location.hostname}`;
+        
         const ADMIN_EMAIL = 'urmilbhansali@gmail.com';
         let inventory = [];
         let originalInventory = [];
@@ -235,7 +240,7 @@
         async function loadInventory() {
             try {
                 const startTime = Date.now();
-                const response = await fetch('http://localhost:3000/api/admin/inventory', {
+                const response = await fetch(`${API_BASE_URL}/api/admin/inventory`, {
                     method: 'GET',
                     headers: getAdminHeaders(),
                 });
@@ -404,7 +409,7 @@
 
         async function saveInventory() {
             try {
-                const response = await fetch('http://localhost:3000/api/admin/inventory', {
+                const response = await fetch(`${API_BASE_URL}/api/admin/inventory`, {
                     method: 'POST',
                     headers: getAdminHeaders(),
                     body: JSON.stringify({ inventory }),

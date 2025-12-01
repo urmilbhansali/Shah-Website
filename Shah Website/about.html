@@ -186,6 +186,11 @@
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
+        // API Base URL - automatically detects production or development
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? '${API_BASE_URL}' 
+            : `https://${window.location.hostname}`;
+        
         // Minimal script for navigation - reuse from main site if needed
         let currentUser = null;
         
@@ -245,7 +250,7 @@
             }
             
             // Fetch Google Client ID from server
-            fetch('http://localhost:3000/api/config')
+            fetch('${API_BASE_URL}/api/config')
                 .then(response => response.json())
                 .then(data => {
                     const clientId = data.googleClientId || '';
@@ -277,7 +282,7 @@
         
         async function handleGoogleSignIn(response) {
             try {
-                const result = await fetch('http://localhost:3000/auth/google', {
+                const result = await fetch('${API_BASE_URL}/auth/google', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

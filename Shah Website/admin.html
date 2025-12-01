@@ -165,6 +165,11 @@
 
     <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script>
+        // API Base URL - automatically detects production or development
+        const API_BASE_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3000' 
+            : `https://${window.location.hostname}`;
+        
         const ADMIN_EMAIL = 'urmilbhansali@gmail.com';
         let orders = [];
         let currentUser = null;
@@ -210,7 +215,7 @@
 
         async function loadOrders() {
             try {
-                const response = await fetch('http://localhost:3000/api/admin/orders', {
+                const response = await fetch(`${API_BASE_URL}/api/admin/orders`, {
                     headers: getAdminHeaders()
                 });
                 const data = await response.json();

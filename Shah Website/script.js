@@ -1,3 +1,8 @@
+// API Base URL - automatically detects production or development
+const API_BASE_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : `https://${window.location.hostname}`;
+
 // Product data - 55 SKUs with some having sub-SKUs
 const products = [
     {
@@ -500,7 +505,7 @@ async function initializeGoogleSignIn() {
         let clientId = '';
         
         try {
-            const response = await fetch('http://localhost:3000/api/config');
+            const response = await fetch(`${API_BASE_URL}/api/config`);
             if (response.ok) {
                 const data = await response.json();
                 clientId = data.googleClientId || '';
@@ -542,7 +547,7 @@ async function initializeGoogleSignIn() {
 async function handleGoogleSignIn(response) {
     try {
         // Send the credential to backend for verification
-        const result = await fetch('http://localhost:3000/auth/google', {
+        const result = await fetch(`${API_BASE_URL}/auth/google`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -696,7 +701,7 @@ async function downloadInvoice() {
     }
     
     try {
-        const response = await fetch(`http://localhost:3000/api/invoice/${currentOrderId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/invoice/${currentOrderId}`, {
             method: 'GET',
         });
         
@@ -1794,7 +1799,7 @@ async function submitOrder() {
         submitBtn.disabled = true;
         
         try {
-            const response = await fetch('http://localhost:3000/api/order', {
+            const response = await fetch(`${API_BASE_URL}/api/order`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1843,7 +1848,7 @@ async function submitOrder() {
     submitBtn.disabled = true;
     
     try {
-        const response = await fetch('http://localhost:3000/create-checkout-session', {
+        const response = await fetch(`${API_BASE_URL}/create-checkout-session`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

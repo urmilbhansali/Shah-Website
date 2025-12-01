@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:padding="4dp">
+
+    <TextView
+        android:id="@+id/setNumberTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Set 1"
+        android:textSize="12sp"
+        android:textColor="@color/white" />
+
+    <EditText
+        android:id="@+id/weightEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:inputType="numberDecimal"
+        android:hint="Weight"
+        android:textSize="12sp"
+        android:padding="4dp"
+        android:minHeight="32dp"
+        android:layout_marginHorizontal="2dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white" />
+
+    <EditText
+        android:id="@+id/repsEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:inputType="number"
+        android:hint="Reps"
+        android:textSize="12sp"
+        android:padding="4dp"
+        android:minHeight="32dp"
+        android:layout_marginHorizontal="2dp"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white" />
+
+</LinearLayout>
+
