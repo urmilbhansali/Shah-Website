@@ -697,11 +697,14 @@ function generateInvoicePDF(order) {
 }
 
 // Email functionality temporarily disabled
+// Email functionality temporarily disabled
 // Send email with invoice using Zoho Mail API
 async function sendInvoiceEmail(order, pdfBuffer) {
-    // Email sending is temporarily disabled
+    // Email sending is temporarily disabled - orders will still be created
     console.log('Email sending is temporarily disabled. Order created successfully.');
     return;
+    
+    // To re-enable email: Remove the return statement above and uncomment the code below
     
     /* Re-enable email by uncommenting the code below and removing the early return above:
     if (!zohoMailConfig) {
