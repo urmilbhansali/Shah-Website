@@ -3,21 +3,15 @@ FROM node:18
 # Set working directory
 WORKDIR /app
 
-# List files in build context (debug)
-RUN ls -la / || echo "Root directory listing"
-
-# Copy package files explicitly
-COPY package.json ./
-COPY package-lock.json ./
-
-# Verify package.json exists
-RUN ls -la && cat package.json | head -5
+# Copy from subdirectory (Shah Website/)
+COPY "Shah Website/package.json" ./
+COPY "Shah Website/package-lock.json"* ./
 
 # Install dependencies
 RUN npm install
 
-# Copy all other files
-COPY . .
+# Copy all other files from subdirectory
+COPY "Shah Website/" ./
 
 # Expose port (Railway will set PORT env var)
 EXPOSE 3000
