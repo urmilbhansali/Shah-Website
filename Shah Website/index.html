@@ -207,9 +207,9 @@
     <!-- Photo Lightbox Modal -->
     <div class="photo-lightbox" id="photoLightbox" onclick="closePhotoLightbox()">
         <div class="photo-lightbox-content" onclick="event.stopPropagation()">
-            <button class="photo-lightbox-close" onclick="closePhotoLightbox()">×</button>
-            <button class="photo-lightbox-prev" onclick="changePhoto(-1)">‹</button>
-            <button class="photo-lightbox-next" onclick="changePhoto(1)">›</button>
+            <button class="photo-lightbox-close" onclick="closePhotoLightbox()" title="Close (ESC)">×</button>
+            <button class="photo-lightbox-prev" onclick="changePhoto(-1)" title="Previous photo (←)">‹</button>
+            <button class="photo-lightbox-next" onclick="changePhoto(1)" title="Next photo (→)">›</button>
             <img id="lightboxImage" src="" alt="Product Photo">
             <div class="photo-lightbox-info">
                 <h3 id="lightboxProductName"></h3>

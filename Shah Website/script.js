@@ -828,7 +828,7 @@ function renderProducts(filterText = '') {
         const totalClass = isInCart ? 'product-total in-cart' : 'product-total';
         
         // Photo display - show first photo if available, or placeholder
-        let photoDisplay = '<div class="product-photo-placeholder">No Image</div>';
+        let photoDisplay = '';
         if (product.photos && product.photos.length > 0) {
             const firstPhoto = product.photos[0];
             const photoUrl = firstPhoto.startsWith('http') ? firstPhoto : `${API_BASE_URL}/images/products/${firstPhoto}`;
@@ -837,8 +837,11 @@ function renderProducts(filterText = '') {
                      alt="${product.name}" 
                      class="product-photo-thumbnail" 
                      onclick="openPhotoLightbox(${product.id})"
-                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'product-photo-placeholder\\'>No Image</div>'">
+                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'product-photo-placeholder\\' onclick=\\'openPhotoLightbox(${product.id})\\' >No Image</div>'">
             `;
+        } else {
+            // Make placeholder clickable too
+            photoDisplay = `<div class="product-photo-placeholder" onclick="openPhotoLightbox(${product.id})">No Image</div>`;
         }
         
         row.innerHTML = `
@@ -1932,21 +1935,37 @@ function saveCartToHistory() {
 // Photo Lightbox functionality
 let currentPhotoIndex = 0;
 let currentProductPhotos = [];
+let currentProductId = null;
 
 // Open photo lightbox
 function openPhotoLightbox(productId) {
     const product = products.find(p => p.id === productId);
-    if (!product || !product.photos || product.photos.length === 0) return;
+    if (!product) return;
     
-    currentProductPhotos = product.photos;
+    currentProductId = productId;
+    currentProductPhotos = product.photos || [];
     currentPhotoIndex = 0;
     
     const lightbox = document.getElementById('photoLightbox');
     const lightboxImage = document.getElementById('lightboxImage');
     const lightboxProductName = document.getElementById('lightboxProductName');
     const lightboxPhotoCounter = document.getElementById('lightboxPhotoCounter');
+    const prevButton = document.querySelector('.photo-lightbox-prev');
+    const nextButton = document.querySelector('.photo-lightbox-next');
     
     lightboxProductName.textContent = product.name;
+    
+    // Show/hide navigation buttons based on number of photos
+    if (currentProductPhotos.length <= 1) {
+        prevButton.style.display = 'none';
+        nextButton.style.display = 'none';
+        lightboxPhotoCounter.textContent = currentProductPhotos.length === 0 ? 'No photos available' : '1 / 1';
+    } else {
+        prevButton.style.display = 'flex';
+        nextButton.style.display = 'flex';
+        lightboxPhotoCounter.textContent = `1 / ${currentProductPhotos.length}`;
+    }
+    
     updateLightboxImage();
     lightbox.classList.add('active');
     
@@ -1980,14 +1999,37 @@ function changePhoto(direction) {
 function updateLightboxImage() {
     const lightboxImage = document.getElementById('lightboxImage');
     const lightboxPhotoCounter = document.getElementById('lightboxPhotoCounter');
+    const prevButton = document.querySelector('.photo-lightbox-prev');
+    const nextButton = document.querySelector('.photo-lightbox-next');
     
-    if (currentProductPhotos.length === 0) return;
+    if (currentProductPhotos.length === 0) {
+        // Show placeholder message when no photos
+        lightboxImage.style.display = 'none';
+        lightboxPhotoCounter.textContent = 'No photos available';
+        if (prevButton) prevButton.style.display = 'none';
+        if (nextButton) nextButton.style.display = 'none';
+        return;
+    }
     
+    // Show image
+    lightboxImage.style.display = 'block';
     const photo = currentProductPhotos[currentPhotoIndex];
     const photoUrl = photo.startsWith('http') ? photo : `${API_BASE_URL}/images/products/${photo}`;
     
     lightboxImage.src = photoUrl;
     lightboxPhotoCounter.textContent = `${currentPhotoIndex + 1} / ${currentProductPhotos.length}`;
+    
+    // Show navigation buttons if multiple photos
+    if (currentProductPhotos.length > 1) {
+        if (prevButton) prevButton.style.display = 'flex';
+        if (nextButton) nextButton.style.display = 'flex';
+    }
+    
+    // Handle image load errors
+    lightboxImage.onerror = function() {
+        this.style.display = 'none';
+        lightboxPhotoCounter.textContent = 'Image not found';
+    };
 }
 
 // Close lightbox on Escape key
