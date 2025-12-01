@@ -457,6 +457,10 @@ let cart = [];
 // Quantity state for each product (for table display)
 let productQuantities = {};
 
+// Pagination state
+let currentPage = 1;
+const itemsPerPage = 50; // Show 50 products per page
+
 // User state
 let currentUser = null;
 let userPriceList = null; // User-specific price list
@@ -779,12 +783,27 @@ function renderProducts(filterText = '') {
         return skuMatch || subSkuMatch || nameMatch || descMatch;
     });
 
+    // Calculate pagination
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+    
+    // Reset to page 1 if current page is out of bounds
+    if (currentPage > totalPages && totalPages > 0) {
+        currentPage = 1;
+    }
+    
+    // Get products for current page
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
+
     if (filteredProducts.length === 0) {
         productsTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 20px; color: #999;">No products found matching your search.</td></tr>';
+        updatePaginationControls(0, 0);
         return;
     }
 
-    filteredProducts.forEach(product => {
+    // Render paginated products
+    paginatedProducts.forEach(product => {
         const row = document.createElement('tr');
         const subSkuDisplay = product.subSku ? `<div class="product-subsku">Sub-SKU: ${product.subSku}</div>` : '';
         const quantity = productQuantities[product.id] || 0;
@@ -861,12 +880,77 @@ function renderProducts(filterText = '') {
         `;
         productsTableBody.appendChild(row);
     });
+    
+    // Update pagination controls
+    updatePaginationControls(filteredProducts.length, totalPages);
+}
+
+// Update pagination controls
+function updatePaginationControls(totalItems, totalPages) {
+    const paginationContainer = document.getElementById('paginationContainer');
+    if (!paginationContainer) return;
+    
+    if (totalPages <= 1) {
+        paginationContainer.innerHTML = `<div class="pagination-info">Showing ${totalItems} product${totalItems !== 1 ? 's' : ''}</div>`;
+        return;
+    }
+    
+    const startItem = (currentPage - 1) * itemsPerPage + 1;
+    const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+    
+    let paginationHTML = `
+        <div class="pagination-info">Showing ${startItem}-${endItem} of ${totalItems} product${totalItems !== 1 ? 's' : ''}</div>
+        <div class="pagination-controls">
+            <button class="pagination-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>
+            <div class="pagination-pages">
+    `;
+    
+    // Show page numbers (max 7 pages visible)
+    let startPage = Math.max(1, currentPage - 3);
+    let endPage = Math.min(totalPages, currentPage + 3);
+    
+    if (startPage > 1) {
+        paginationHTML += `<button class="pagination-page" onclick="goToPage(1)">1</button>`;
+        if (startPage > 2) {
+            paginationHTML += `<span class="pagination-ellipsis">...</span>`;
+        }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        paginationHTML += `<button class="pagination-page ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+    }
+    
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            paginationHTML += `<span class="pagination-ellipsis">...</span>`;
+        }
+        paginationHTML += `<button class="pagination-page" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+    }
+    
+    paginationHTML += `
+            </div>
+            <button class="pagination-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
+        </div>
+    `;
+    
+    paginationContainer.innerHTML = paginationHTML;
+}
+
+// Go to specific page
+function goToPage(page) {
+    const searchInput = document.getElementById('searchInput');
+    const filterText = searchInput ? searchInput.value.trim() : '';
+    currentPage = page;
+    renderProducts(filterText);
+    // Scroll to top of table
+    document.querySelector('.products-table')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // Filter products based on search input
 function filterProducts() {
     const searchInput = document.getElementById('searchInput');
     const filterText = searchInput.value.trim();
+    currentPage = 1; // Reset to page 1 when searching
     renderProducts(filterText);
 }
 
