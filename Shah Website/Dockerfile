@@ -6,6 +6,9 @@ WORKDIR /app
 COPY package.json ./
 COPY package-lock.json* ./
 
+# Verify package.json exists (debug)
+RUN ls -la /app/ && cat package.json | head -3
+
 # Install dependencies
 RUN npm install
 
