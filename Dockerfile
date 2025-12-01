@@ -3,9 +3,9 @@ FROM node:18
 # Set working directory
 WORKDIR /app
 
-# Copy package files from subdirectory (use wildcard to handle space)
+# Copy package files from subdirectory (use JSON array syntax for paths with spaces)
 COPY ["Shah Website/package.json", "./"]
-COPY ["Shah Website/package-lock.json", "./"] 2>/dev/null || true
+COPY ["Shah Website/package-lock.json", "./"]
 
 # Install dependencies
 RUN npm install
