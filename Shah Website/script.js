@@ -1819,34 +1819,23 @@ function showCheckoutModal(shippingMethod, shippingEmail, shippingName, shipping
             <div class="payment-options">
                 <label class="payment-option">
                     <input type="radio" name="paymentMethod" value="card" checked>
-                    <span>Credit/Debit Card</span>
+                    <span>Credit/Debit Card (via Stripe)</span>
                 </label>
                 <label class="payment-option">
                     <input type="radio" name="paymentMethod" value="cash">
                     <span>Cash on Delivery</span>
                 </label>
             </div>
-            <div id="cardDetails" class="card-details">
-                <div class="form-group">
-                    <label>Card Number</label>
-                    <input type="text" id="cardNumber" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Expiry Date</label>
-                        <input type="text" id="cardExpiry" class="form-input" placeholder="MM/YY" maxlength="5">
-                    </div>
-                    <div class="form-group">
-                        <label>CVV</label>
-                        <input type="text" id="cardCVV" class="form-input" placeholder="123" maxlength="3">
-                    </div>
-                </div>
-            </div>
+            <p style="font-size: 12px; color: #666; margin-top: 10px; padding: 10px; background-color: #f9f9f9; border-radius: 4px;">
+                <strong>Note:</strong> Card payments will redirect you to Stripe's secure checkout page to complete your payment.
+            </p>
         </div>
         
         <div class="checkout-actions">
             <button class="cancel-btn" onclick="closeCheckout()">Cancel</button>
-            <button class="submit-order-btn confirm-order-btn" onclick="submitOrder()">Confirm Order</button>
+            <button class="submit-order-btn confirm-order-btn" onclick="submitOrder()" id="confirmOrderBtn">
+                <span id="confirmOrderBtnText">Place Order</span>
+            </button>
         </div>
     `;
     
@@ -1905,19 +1894,10 @@ function checkout() {
 }
 
 // Toggle card details based on payment method
+// Setup payment method toggle (no card details needed since Stripe handles it)
 function setupPaymentToggle() {
-    const paymentRadios = document.querySelectorAll('input[name="paymentMethod"]');
-    const cardDetails = document.getElementById('cardDetails');
-    
-    paymentRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.value === 'card') {
-                cardDetails.style.display = 'block';
-            } else {
-                cardDetails.style.display = 'none';
-            }
-        });
-    });
+    // Payment method toggle is handled by radio buttons
+    // No card details to show/hide since Stripe Checkout handles card input
 }
 
 // Close checkout modal
