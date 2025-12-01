@@ -1,5 +1,4 @@
 const express = require('express');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const cors = require('cors');
 const { OAuth2Client } = require('google-auth-library');
 const PDFDocument = require('pdfkit');
@@ -12,8 +11,29 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Initialize Google OAuth client
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+// Initialize Stripe (only if key is provided)
+let stripe = null;
+if (process.env.STRIPE_SECRET_KEY) {
+    try {
+        stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    } catch (error) {
+        console.warn('Stripe initialization failed:', error.message);
+    }
+} else {
+    console.warn('STRIPE_SECRET_KEY not set. Stripe features will be disabled.');
+}
+
+// Initialize Google OAuth client (only if client ID is provided)
+let client = null;
+if (process.env.GOOGLE_CLIENT_ID) {
+    try {
+        client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    } catch (error) {
+        console.warn('Google OAuth initialization failed:', error.message);
+    }
+} else {
+    console.warn('GOOGLE_CLIENT_ID not set. Google OAuth features will be disabled.');
+}
 
 // In-memory storage for user price lists (in production, use a database)
 let userPriceLists = {};
@@ -347,6 +367,13 @@ app.post('/auth/email/login', async (req, res) => {
 // Google OAuth verification endpoint
 app.post('/auth/google', async (req, res) => {
     try {
+        if (!client) {
+            return res.status(500).json({ 
+                success: false, 
+                error: 'Google OAuth not configured. Please set GOOGLE_CLIENT_ID environment variable.' 
+            });
+        }
+        
         const { credential } = req.body;
         
         if (!credential) {
@@ -455,6 +482,12 @@ app.post('/api/user/:userId/pricelist', (req, res) => {
 // Stripe Checkout Session endpoint
 app.post('/create-checkout-session', async (req, res) => {
     try {
+        if (!stripe) {
+            return res.status(500).json({ 
+                error: 'Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.' 
+            });
+        }
+        
         const { items, shippingAddress, shippingMethod, shippingCost } = req.body;
 
         // Create line items for Stripe
@@ -511,6 +544,12 @@ app.post('/create-checkout-session', async (req, res) => {
 // Verify payment session endpoint
 app.get('/verify-session/:sessionId', async (req, res) => {
     try {
+        if (!stripe) {
+            return res.status(500).json({ 
+                error: 'Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.' 
+            });
+        }
+        
         const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
         
         // If payment is complete and order exists, send email
@@ -761,6 +800,12 @@ app.get('/api/invoice/:orderId', async (req, res) => {
 // Update Stripe checkout to create order after payment
 app.post('/create-checkout-session', async (req, res) => {
     try {
+        if (!stripe) {
+            return res.status(500).json({ 
+                error: 'Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.' 
+            });
+        }
+        
         const { items, shippingAddress, shippingMethod, shippingCost, shippingEmail } = req.body;
 
         // Create line items for Stripe
