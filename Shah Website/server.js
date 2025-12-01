@@ -118,10 +118,12 @@ function saveProducts() {
 let transporter = null;
 if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
     const smtpPort = parseInt(process.env.SMTP_PORT || '587');
+    const isSSL = smtpPort === 465;
+    
     transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: smtpPort,
-        secure: smtpPort === 465, // SSL for port 465, TLS for port 587
+        secure: isSSL, // SSL for port 465, TLS for port 587
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS,
@@ -131,12 +133,12 @@ if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
         socketTimeout: 30000,
         tls: {
             rejectUnauthorized: false, // Allow self-signed certificates if needed
-            ciphers: 'SSLv3'
+            minVersion: 'TLSv1.2'
         },
         debug: true, // Enable debug logging
         logger: true
     });
-    console.log(`Email transporter configured for ${process.env.SMTP_USER} via ${process.env.SMTP_HOST}:${smtpPort}`);
+    console.log(`Email transporter configured for ${process.env.SMTP_USER} via ${process.env.SMTP_HOST}:${smtpPort} (SSL: ${isSSL})`);
 } else {
     console.warn('Email not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASS in .env to enable email sending.');
 }
