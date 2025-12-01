@@ -494,70 +494,6 @@ app.post('/api/user/:userId/pricelist', (req, res) => {
     }
 });
 
-// Stripe Checkout Session endpoint
-app.post('/create-checkout-session', async (req, res) => {
-    try {
-        if (!stripe) {
-            return res.status(500).json({ 
-                error: 'Stripe is not configured. Please set STRIPE_SECRET_KEY environment variable.' 
-            });
-        }
-        
-        const { items, shippingAddress, shippingMethod, shippingCost, shippingEmail } = req.body;
-
-        // Create line items for Stripe
-        const lineItems = items.map(item => ({
-            price_data: {
-                currency: 'usd',
-                product_data: {
-                    name: item.name,
-                    description: item.description || `SKU: ${item.sku}`,
-                },
-                unit_amount: Math.round(item.price * 100), // Convert to cents
-            },
-            quantity: item.quantity,
-        }));
-
-        // Add shipping as a line item if applicable
-        if (shippingCost > 0) {
-            lineItems.push({
-                price_data: {
-                    currency: 'usd',
-                    product_data: {
-                        name: `Shipping - ${shippingMethod}`,
-                    },
-                    unit_amount: Math.round(shippingCost * 100),
-                },
-                quantity: 1,
-            });
-        }
-
-        // Create Stripe Checkout Session
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            line_items: lineItems,
-            mode: 'payment',
-            success_url: `${req.headers.origin}/success.html?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${req.headers.origin}/index.html`,
-            customer_email: shippingEmail || shippingAddress?.email || undefined,
-            shipping_address_collection: shippingMethod !== 'pickup' ? {
-                allowed_countries: ['US', 'CA'],
-            } : undefined,
-            metadata: {
-                shipping_method: shippingMethod,
-                item_count: items.length.toString(),
-                // Store only SKUs and quantities to stay under 500 char limit
-                items_summary: items.map(item => `${item.sku}:${item.quantity}`).join(',').substring(0, 400),
-            },
-        });
-
-        res.json({ sessionId: session.id, url: session.url });
-    } catch (error) {
-        console.error('Error creating checkout session:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
 // Endpoint to provide Stripe Publishable Key to frontend
 app.get('/api/stripe-key', (req, res) => {
     if (process.env.STRIPE_PUBLISHABLE_KEY) {
@@ -936,9 +872,8 @@ app.post('/create-checkout-session', async (req, res) => {
             metadata: {
                 order_id: orderId,
                 shipping_method: shippingMethod,
-                item_count: items.length.toString(),
-                // Store only SKUs and quantities to stay under 500 char limit
-                items_summary: items.map(item => `${item.sku}:${item.quantity}`).join(',').substring(0, 400),
+                // Full order details stored in orders.json, not in Stripe metadata
+                // This ensures metadata stays under 500 char limit regardless of order size
             },
         });
 
